@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">CourseCodify_V1</string>
+    <string name="app_name">Course Codify</string>
+    <string name="todays_event">Today\'s Event</string>
 </resources>

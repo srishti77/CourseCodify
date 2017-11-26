@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CourseCodify_V1.iml" filepath="$PROJECT_DIR$/CourseCodify_V1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CourseCodify.iml" filepath="$PROJECT_DIR$/CourseCodify.iml" />
+      <module fileurl="file://C:\Users\User\Desktop\CourseCodify\CourseCodify_V1.iml" filepath="C:\Users\User\Desktop\CourseCodify\CourseCodify_V1.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\User\Desktop\CourseCodify\app\app.iml" filepath="C:\Users\User\Desktop\CourseCodify\app\app.iml" />
     </modules>
   </component>
 </project>
