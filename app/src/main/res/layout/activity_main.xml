@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.srishti.srish.coursecodify_v1.MainActivity">
+    tools:context="com.srishti.srish.coursecodify_v1.NavigationDrawerActivity">
 
 
     <CalendarView
@@ -27,9 +27,13 @@
         android:textColorHighlight="@color/colorPrimary"
         android:id="@+id/todayEvent"/>
 
+
   <ExpandableListView
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_below="@id/todayEvent"
-      android:id="@+id/expandable_LV"></ExpandableListView>
+      android:id="@+id/expandable_LV"
+      ></ExpandableListView>
+
+
 </RelativeLayout>

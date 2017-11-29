@@ -15,11 +15,11 @@ import android.widget.Toast;
 
 import com.srishti.srish.coursecodify_v1.R;
 
-public class CalendarPreference extends PreferenceFragment {
+public class CalendarPreferenceSetting extends PreferenceFragment {
 
 
-    CharSequence[] calendarNamesArray = MainActivity.calendarNamesList.
-            toArray(new CharSequence[MainActivity.calendarNamesList.size()]);
+    CharSequence[] calendarNamesArray = NavigationDrawerActivity.calendarNamesList.
+            toArray(new CharSequence[NavigationDrawerActivity.calendarNamesList.size()]);
 
     //String selectedCalendar= "1";
     CharSequence[] calendarIdsArray= new CharSequence[calendarNamesArray.length];
@@ -49,6 +49,7 @@ public class CalendarPreference extends PreferenceFragment {
         for(int i=0;i<calendarNamesArray.length;i++)
             calendarIdsArray[i] = (i+1)+"";
 
+        Log.i("Print selected Index",sharedPreferences.getInt("SelectedIndex",0)+"" );
 
         if(sharedPreferences.getInt("SelectedIndex",0) != 0 && calendarNamesArray.length>0){
             Log.i("Inside", "if statement");

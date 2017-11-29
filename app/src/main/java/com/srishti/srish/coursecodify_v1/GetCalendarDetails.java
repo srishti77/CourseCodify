@@ -105,19 +105,19 @@ public class GetCalendarDetails {
 
             for (int i = 0; i < cursorForEvent.getCount(); i++) {
 
+               // Log.i("", getDate(Long.parseLong(cursorForEvent.getString(1))));
+
                 if ((cursorForEvent.getString(0)) != null && cursorForEvent.getString(1) != null && cursorForEvent.getString(2) != null
-                     &&  getDate(Long.parseLong(cursorForEvent.getString(1))).compareTo(getDate()+" 00:00:00 AM")> 0 &&
-                        getDate(Long.parseLong(cursorForEvent.getString(2))).compareTo(getDate()+" 23:59:59 PM") < 0 ) {
+                        &&  getDate(Long.parseLong(cursorForEvent.getString(1))).compareTo(getDate()) == 0
+                        ) {
 
                     eventNames.add(cursorForEvent.getString(0));
 
                     Log.i("Event Name", "" + cursorForEvent.getString(0));
                     Log.i("Start Time", "" + getDate(Long.parseLong(cursorForEvent.getString(1))));
-                    Log.i("End Time", "" + getDate(Long.parseLong(cursorForEvent.getString(2))));
+                   // Log.i("End Time", "" + getDate(Long.parseLong(cursorForEvent.getString(2))));
 
-                    if(getDate(Long.parseLong(cursorForEvent.getString(1))).compareTo(getDate())< 0 && getDate(Long.parseLong(cursorForEvent.getString(2))).compareTo(getDate()) > 0){
-                        Log.i("Between time","yayyy");
-                    }
+
                 }
 
                 cursorForEvent.moveToNext();
@@ -133,9 +133,10 @@ public class GetCalendarDetails {
     public static String getDate(long milliSeconds) {
         //Change the format to dd/mm/yyy
         SimpleDateFormat formatter = new SimpleDateFormat(
-                "dd/MM/yyyy hh:mm:ss a");
+                "dd/MM/yyyy");
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
+        Log.i("Date from Calendar", formatter.format(calendar.getTime())+"");
         return formatter.format(calendar.getTime());
     }
 
