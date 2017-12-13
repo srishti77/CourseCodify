@@ -27,6 +27,7 @@
         </activity>
         <activity
             android:name=".SettingActivity"
+            android:parentActivityName=".NavigationDrawerActivity"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".TakeImagesActivity"
@@ -38,8 +39,18 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ViewImageFullScreenActivity"
+            android:parentActivityName=".ViewListOfPicturesActivity"
+            android:theme="@style/AppTheme" />
+
+        <activity android:name=".TakeNotesActivity"
+            android:parentActivityName=".NavigationDrawerActivity"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".ViewListOfNotesActivity"
+            android:parentActivityName=".TakeNotesActivity"
             android:theme="@style/AppTheme"></activity>
-        <activity android:name=".TakeNotesActivity"></activity>
+
+
     </application>
 
 </manifest>

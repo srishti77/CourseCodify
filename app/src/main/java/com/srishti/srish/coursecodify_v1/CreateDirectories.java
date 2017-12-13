@@ -42,6 +42,23 @@ public class CreateDirectories {
         return mediaStorageDir.getName();
     }
 
+    public String createFolder(String FolderName){
+        File mediaStorageDir = new File(
+                Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "CourseCodify/"+ FolderName);
+
+        if(!mediaStorageDir.exists()){
+
+            mediaStorageDir.mkdirs();
+            if(!mediaStorageDir.mkdirs()){
+                Log.i("mainFile is created","CourseCodify");
+            }
+        }
+        Log.i("MainDirectory","CourseCodify");
+        return mediaStorageDir.getName();
+    }
+
+
 
 
 }

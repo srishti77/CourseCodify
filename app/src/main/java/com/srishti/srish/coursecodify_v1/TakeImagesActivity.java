@@ -470,7 +470,9 @@ public class TakeImagesActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int id = item.getItemId();
+
         if(id == R.id.home){
             this.finish();
             return true;
@@ -483,7 +485,6 @@ public class TakeImagesActivity extends AppCompatActivity {
     }
 
     public void setByteOfImage(byte[] imageByte){
-
         saveImageByte = imageByte;
 
     }

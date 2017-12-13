@@ -2,6 +2,7 @@ package com.srishti.srish.coursecodify_v1;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -240,5 +241,16 @@ public class GetCalendarDetails {
 
     }
 
+    public void goToCalendar(){
+
+        long startMills = System.currentTimeMillis();
+        Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
+        builder.appendPath("time");
+        ContentUris.appendId(builder, startMills);
+        Intent intent = new Intent(Intent.ACTION_VIEW).setData(builder.build());
+        context.startActivity(intent);
+
+
+    }
 
 }

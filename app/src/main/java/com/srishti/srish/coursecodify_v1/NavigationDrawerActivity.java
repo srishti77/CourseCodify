@@ -224,6 +224,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_notes) {
+          Intent intent = new Intent(NavigationDrawerActivity.this, TakeNotesActivity.class);
+          startActivity(intent);
 
         } else if (id == R.id.nav_manage) {
 

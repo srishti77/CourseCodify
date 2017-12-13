@@ -1,9 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.srishti.srish.coursecodify_v1.TakeNotesActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Write you Title here"
+        android:id="@+id/titleNotes"
+        android:textColor="@color/colorAccent"
+        android:textSize="25dp"/>
+
+    <EditText
+        android:id="@+id/notesBody"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="25dp"
+        android:textStyle = "italic"
+        android:gravity="top|left"
+        android:inputType="textMultiLine"
+        android:layout_below="@+id/titleNotes"
+        android:paddingTop="10dp"
+        />
+
+
+</RelativeLayout>
