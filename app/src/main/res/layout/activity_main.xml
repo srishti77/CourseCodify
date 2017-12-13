@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/todays_event"
-        android:paddingTop="20dp"
+        android:paddingTop="40dp"
         android:textColorHighlight="@color/colorPrimary"
         android:id="@+id/todayEvent"/>
 
@@ -33,6 +33,8 @@
       android:layout_height="match_parent"
       android:layout_below="@id/todayEvent"
       android:id="@+id/expandable_LV"
+      android:background="@color/silver"
+      android:divider="#00000000"
       ></ExpandableListView>
 
 

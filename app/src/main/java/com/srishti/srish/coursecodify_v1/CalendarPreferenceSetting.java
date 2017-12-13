@@ -40,6 +40,7 @@ public class CalendarPreferenceSetting extends PreferenceFragment {
         preferenceScreen.addPreference(preferenceCategory);
         listCalendarPreference.setTitle("Sync Calendar");
 
+        Log.i("calendarNamesArray size", calendarNamesArray.length+"");
         listCalendarPreference.setEntries(calendarNamesArray);
         listCalendarPreference.setEntryValues(calendarIdsArray);
         listCalendarPreference.setValue(calendarIdsArray + "");
@@ -93,4 +94,6 @@ public class CalendarPreferenceSetting extends PreferenceFragment {
     public String getSelectedCalendar(){
         return selectedCalendar;
     }
+
+
 }

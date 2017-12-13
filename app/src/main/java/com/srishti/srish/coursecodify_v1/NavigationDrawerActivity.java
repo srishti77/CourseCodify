@@ -1,6 +1,7 @@
 package com.srishti.srish.coursecodify_v1;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MenuInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,12 +26,18 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
+/*
+This is our main class.
+It consist of calendar and the list of today's event
+ */
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -42,16 +50,21 @@ public class NavigationDrawerActivity extends AppCompatActivity
     static List<String> calendarNamesList = new ArrayList<String>();
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
-    CalendarPreferenceSetting calendarPreferenceSetting = new CalendarPreferenceSetting();
-    GetCalendarDetails getCalendarName;
 
+    SharedPreferences sharedPreferences;
+    boolean firstInstallation = true;
 
+    CreateDirectories create = new CreateDirectories();
+    final GetCalendarDetails getCalendarName = new GetCalendarDetails(NavigationDrawerActivity.this);
+
+    static boolean calendarPermission = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -75,38 +88,83 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             //Here we add Man Activity
 
-            listOfSubDirectory.clear();
-            listOfSubDirectory.add("Images");
-            listOfSubDirectory.add("Notes");
-            listOfSubDirectory.add("Recordings");
+        listOfSubDirectory.clear();
+        listOfSubDirectory.add("Images");
+        listOfSubDirectory.add("Notes");
+        listOfSubDirectory.add("Recordings");
 
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{
                                 Manifest.permission.READ_CALENDAR}, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 
+        }
+
+
+
+
+
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(NavigationDrawerActivity.this);
+            firstInstallation = sharedPreferences.getBoolean("FIRST_RUN", false);
+
+            if (!firstInstallation) {
+                sharedPreferences.edit().putBoolean("FIRST_RUN", true).commit();
+                create.createCourseCodifyFile();
+
+                AlertDialog.Builder goToSettings = new AlertDialog.Builder(NavigationDrawerActivity.this);
+                goToSettings.setMessage("Go to Settings to choose Calendar?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                calendarNamesList.clear();
+                                calendarNamesList.addAll(getCalendarName.getAllCalendarName());
+
+                                Log.i("Length of Calendarnames", calendarNamesList.size() + "");
+                                Intent settingsIntent = new Intent(NavigationDrawerActivity.this, SettingActivity.class);
+                                startActivity(settingsIntent);
+                            }
+                        })
+                        .setNegativeButton("Not Now", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                AlertDialog alertForSettingsConfig = goToSettings.create();
+                alertForSettingsConfig.show();
             }
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(NavigationDrawerActivity.this);
-            getCalendarName = new GetCalendarDetails(NavigationDrawerActivity.this);
-            calendarNamesList.clear();
-            calendarNamesList.addAll(getCalendarName.getAllCalendarName());
-            listOfEvents_Today.clear();
-            Log.i("Selected calendar is", sharedPreferences.getInt("SelectedIndex", -1) +"" );
-            listOfEvents_Today.addAll(getCalendarName.getAllEventsFromPreferredCalendar(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1)-1)));
+            // getCalendarName = new GetCalendarDetails(NavigationDrawerActivity.this);
 
 
-            directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
-            CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView);
+        /*
+        when no calendar is selected we want user to select the calendar
+         */
+        calendarNamesList.clear();
+        calendarNamesList.addAll(getCalendarName.getAllCalendarName());
+            if (!getCalendarName.getAllCalendarName().isEmpty()) {
+                Log.i("sharedP selectedIndex", (sharedPreferences.getInt("SelectedIndex", -1) - 1)+"");
+                listOfEvents_Today.clear();
+                listOfEvents_Today.addAll(getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1)));
+                directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
 
-            ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.expandable_LV);
+            }
 
-            expandableListView.setAdapter(directoryExpandableListAdapter);
+        CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView);
 
-            TextView textView = (TextView) findViewById(R.id.todayEvent);
+        ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.expandable_LV);
 
+        expandableListView.setAdapter(directoryExpandableListAdapter);
 
+        TextView textView = (TextView) findViewById(R.id.todayEvent);
 
+        textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1)-1));
+                    getCalendarName.getCurrentEvent();
+                }
+        });
 
     }
 
@@ -191,7 +249,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                         && grantResults[0] == PERMISSION_GRANTED) {
 
                     Log.i("Permission Granted","Permission Granted");
-
+                    whenPermissionIsGranted();
 
                 } else {
                     if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CALENDAR))
@@ -212,6 +270,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 break;
 
         }
+    }
+
+    public void whenPermissionIsGranted(){
+
+
     }
 
 }
