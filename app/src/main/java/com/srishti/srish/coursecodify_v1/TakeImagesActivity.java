@@ -64,7 +64,7 @@ public class TakeImagesActivity extends AppCompatActivity {
     private CaptureRequest.Builder previewBuilder;
     private CameraCaptureSession previewSession;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
-    CreateDirectories createMainFile = new CreateDirectories();
+    CreateDirectories createDirectories = new CreateDirectories();
     private static final SparseIntArray ORIENTATIONS=new SparseIntArray();
     static
     {
@@ -249,6 +249,7 @@ public class TakeImagesActivity extends AppCompatActivity {
             previewsize=map.getOutputSizes(SurfaceTexture.class)[0];
             Log.i("Preview Size Width", previewsize.getWidth()+"");
             Log.i("Preview Size Height", previewsize.getHeight()+"");
+
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(TakeImagesActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
                 return;
@@ -388,12 +389,13 @@ public class TakeImagesActivity extends AppCompatActivity {
            return mediaStorageDir;
         }
         else {
-            Log.i("GetOutputMediaFile", createMainFile.createCourseCodifyFile());
-
+           // Log.i("GetOutputMediaFile", createDirectories.createCourseCodifyFile());
+            createDirectories.createCourseCodifyFile();
+            createDirectories.createNoMedia();
              mediaStorageDir = new File(
                     Environment
                             .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-                    createMainFile.createCourseCodifyFile() + "/" + getCalendarDetails.getCurrentEvent());
+                     createDirectories.createCourseCodifyFile() + "/" + getCalendarDetails.getCurrentEvent()+"/Images");
             if (!mediaStorageDir.exists()) {
                 Log.i("Make ","Directory");
                 mediaStorageDir.mkdirs();
@@ -420,27 +422,7 @@ public class TakeImagesActivity extends AppCompatActivity {
     }
 
     public void goTOCalendar(){
-       /* Calendar cal = new GregorianCalendar();
-        cal.setTime(new Date());
-        Date currentDate = new Date();
-        cal.add(Calendar.MONTH, 2);
-        long time = cal.getTime().getTime();
-        Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
-        builder.appendPath("time");
-        builder.appendPath(Long.toString(time));
-        Intent intent = new Intent(Intent.ACT, builder.build());
-        intent.setData(CalendarContract.Events.CONTENT_URI);
-        Time currentTime = new Time();
-        currentTime.setToNow();
-        long dstart = currentTime.toMillis(false);
 
-        currentTime.set(59, 59, 18, currentTime.monthDay, currentTime.month, currentTime.year );
-        long dEnd = currentTime.toMillis(false);
-        intent.putExtra(CalendarContract.Events.DTSTART, dstart);
-        intent.putExtra(CalendarContract.Events.DTEND,  dEnd);
-        intent.putExtra(CalendarContract.Events.TITLE, "MyNewEvent");
-        startActivity(intent);
-        */
        long startMills = System.currentTimeMillis();
        Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
        builder.appendPath("time");
@@ -479,6 +461,7 @@ public class TakeImagesActivity extends AppCompatActivity {
         }
         if(id == R.id.viewlistOfPicture){
             Intent intent = new Intent(TakeImagesActivity.this,  ViewListOfPicturesActivity.class);
+            intent.putExtra("CurrentCalendarEvent", getCalendarDetails.getCurrentEvent());
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

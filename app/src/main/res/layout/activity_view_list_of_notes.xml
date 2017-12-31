@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.srishti.srish.coursecodify_v1.ViewListOfNotesActivity">
+    tools:context="com.srishti.srish.coursecodify_v1.ViewListOfNotesActivity"
+    android:background="#F0F8FF">
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="50dp"
+        android:id="@+id/notes_listOfEvents"
+        android:background="@mipmap/spinnerbackground"
+    />
 
     <ListView
         android:id="@+id/listView"
+        android:layout_below="@+id/notes_listOfEvents"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:minHeight="100dp"
         android:layout_marginBottom="10dp"
         android:textStyle = "bold"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_marginTop="5dp"
         android:gravity="center"
         android:horizontalSpacing="10dp"
@@ -23,4 +34,4 @@
         />
 
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

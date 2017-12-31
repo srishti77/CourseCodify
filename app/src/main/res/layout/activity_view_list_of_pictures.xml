@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.srishti.srish.coursecodify_v1.ViewListOfPicturesActivity">
 
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="50dp"
+        android:id="@+id/images_listOfEvents"
+        android:background="@mipmap/spinnerbackground"
+        />
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/images_listOfEvents"
         android:id="@+id/listOfImage"
         ></ListView>
-s
-</android.support.constraint.ConstraintLayout>
+
+</RelativeLayout>

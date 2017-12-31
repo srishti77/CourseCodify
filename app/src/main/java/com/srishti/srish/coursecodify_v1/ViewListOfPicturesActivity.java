@@ -17,13 +17,17 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.ShareActionProvider;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ViewListOfPicturesActivity extends AppCompatActivity {
 
@@ -32,29 +36,93 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
     ArrayList<String> nameOfFiles =  new ArrayList<String>();
 
     Drawable drawableImage;
-
-
+    CreateDirectories createDirectories = new CreateDirectories();
+    Spinner spinnerListOfEvents;
+    String selectedEvent = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_list_of_pictures);
 
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        spinnerListOfEvents = (Spinner) findViewById(R.id.images_listOfEvents);
 
+        List listOfevents = new ArrayList<>();
+
+
+        listOfevents.addAll(createDirectories.readAllDirectoryName(null, null));
+        Log.i("Count of Events", listOfevents.size()+ "");
+        ArrayAdapter<String> arrayAdapterListOfEvents = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,listOfevents );
+        arrayAdapterListOfEvents.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerListOfEvents.setAdapter(arrayAdapterListOfEvents);
         final ArrayList<String> imageName = new ArrayList<>();
 
-        //File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "MyCameraApp");
-        for (File file : getCurrentFile().listFiles()) {
-            if (file.isFile()) {
-                drawableImage =Drawable.createFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/MyCameraApp/"+file.getName());
-                drawables.add(drawableImage);
+        Intent intent = getIntent();
+        String event = intent.getStringExtra("CurrentCalendarEvent");
 
-                nameOfFiles.add(file.getName());
+        if(event != null){
+
+            spinnerListOfEvents.setSelection(arrayAdapterListOfEvents.getPosition(event));
+        }
+
+        spinnerListOfEvents.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                drawables.clear();
+                nameOfFiles.clear();
+                imageName.clear();
+                Log.i("Spinner", "spinner is changed");
+
+                if(createDirectories.getCurrentFile("/CourseCodify/"+spinnerListOfEvents.getSelectedItem()+"/Images").listFiles() != null) {
+
+                    for (File file : createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images").listFiles()) {
+                        if (file.isFile()) {
+
+                            drawableImage = Drawable.createFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images/" + file.getName());
 
 
-                imageName.add(file.getName());
+                            drawables.add(drawableImage);
+
+                            nameOfFiles.add(file.getName());
+
+
+                            imageName.add(file.getName());
+                            arrayAdapter.notifyDataSetChanged();
+
+                        }
+                    }
+                }
+
+            }
+
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        } );
+
+           /* if(createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images" )!= null){
+
+            for (File file : createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images").listFiles()) {
+                if (file.isFile()) {
+                    Log.i("Picture Name:", file.getName());
+                    drawableImage = Drawable.createFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images/" + file.getName());
+                    Log.i("DrawableImages", drawableImage + "");
+
+                    drawables.add(drawableImage);
+
+                    nameOfFiles.add(file.getName());
+
+
+                    imageName.add(file.getName());
+                }
             }
         }
+        else{
+            Toast.makeText(getApplicationContext(), "No element to display", Toast.LENGTH_LONG).show();
+        }*/
 
         final ListView listView = (ListView)  findViewById(R.id.listOfImage);
         arrayAdapter = new ListSingleImageAdapter(this, drawables, imageName);
@@ -95,7 +163,7 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
                             Log.i("Delete Position", position+"");
                             Log.i("CountImageName Array",imageName.size()+"" );
 
-                            File directory = getCurrentFile();
+                            File directory = createDirectories.getCurrentFile("CourseCodify/"+spinnerListOfEvents.getSelectedItem()+"/Images");
                             for(File file : directory.listFiles()){
                                 if(imageName.get(position).compareTo(file.getName()) == 0){
                                     file.delete();
@@ -136,6 +204,7 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
     }
 
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.home){
@@ -146,11 +215,8 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    File getCurrentFile(){
 
-        File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "MyCameraApp");
-        return directory;
-    }
+
 
 
 

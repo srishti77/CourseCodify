@@ -2,7 +2,9 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#FF9933</color>
     <color name= "silver">#CCCCCC</color>
     <color name="white">#FFFFFF</color>
+    <color name = "blue">#56A0D3</color>
+    <color name="teal">#008080</color>
 </resources>

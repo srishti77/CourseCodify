@@ -22,7 +22,8 @@ import java.util.ArrayList;
      private Context context;
      private ArrayList<String> groupName;
      private ArrayList<String> subdirectoryName;
-
+        CreateDirectories createDirectories = new CreateDirectories();
+    TextView eventName;
      public DirectoryExpandableListAdapter(Context context, ArrayList<String> groupName, ArrayList<String> subdirectoreyName){
 
          this.context = context;
@@ -84,7 +85,7 @@ import java.util.ArrayList;
 
         }
 
-        TextView eventName = (TextView) view.findViewById(R.id.eventName);
+         eventName = (TextView) view.findViewById(R.id.eventName);
         Log.i("Here I am", "getGroupView");
         eventName.setText(groupName.get(i));
         return view;
@@ -100,6 +101,10 @@ import java.util.ArrayList;
 
          TextView childName = (TextView) view.findViewById(R.id.eventSubdirectory);
         childName.setText(subdirectoryName.get(i1));
+
+        TextView childCount = (TextView) view.findViewById(R.id.countChildItem);
+        Log.i( "Event Name --:"+ eventName.getText(), childName.getText()+"");
+        childCount.setText(" "+createDirectories.readAllDirectoryName(eventName.getText().toString(),childName.getText().toString()).size());
         return view;
     }
 

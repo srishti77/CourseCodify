@@ -1,7 +1,11 @@
 package com.srishti.srish.coursecodify_v1;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +18,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -26,8 +31,13 @@ public class TakeNotesActivity extends AppCompatActivity {
     ArrayList<String> notesBodies = new ArrayList<String>();
 
     GetCalendarDetails getCalendarDetails = new GetCalendarDetails(TakeNotesActivity.this);
+    CreateDirectories createDirectories = new CreateDirectories();
     int noteId;
-
+    String notesContent;
+    String currentEvent;
+    boolean createdEvent = false;
+    private static final int REQUEST_FileAccess_PERMISSION = 300;
+    ViewListOfNotesActivity viewListOfNotesActivity = new ViewListOfNotesActivity();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,89 +50,25 @@ public class TakeNotesActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         noteId = intent.getIntExtra("NoteId", -1);
+        notesContent = intent.getStringExtra("NotesContent");
         Log.i("NoteId ", noteId + "");
 
         if (noteId != -1) {
+            Log.i("Notes returned", notesContent);
             notesTitle.setText(ViewListOfNotesActivity.notesTitles.get(noteId).toString());
-            notesBody.setText(ViewListOfNotesActivity.notesBodies.get(noteId).toString());
+            notesBody.setText(notesContent);
+        } else {
+            noteId = 0;
+            ViewListOfNotesActivity.notesTitles.add("");
+            ViewListOfNotesActivity.notesBodies.add("");
         }
 
 
-        else{
-            noteId= 0;
-            ViewListOfNotesActivity.notesTitles.add("Text0");
-            ViewListOfNotesActivity.notesBodies.add(" ");
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+
+            ActivityCompat.requestPermissions(TakeNotesActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_FileAccess_PERMISSION);
+            return;
         }
-
-
-
-       try {
-            TextWatcher textWatcherTitle = new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                    if(s == ""){
-                        ViewListOfNotesActivity.notesTitles.set(noteId, "Text"+noteId);
-                    }
-                    else{
-                        //ViewListOfNotesActivity.notesTitles.add("Text0");
-                        ViewListOfNotesActivity.notesTitles.set(noteId,s+ "");
-                    }
-
-                  if(noteId > 0){
-                        ViewListOfNotesActivity.arrayAdapter.notifyDataSetChanged();
-                  }
-
-                }
-
-
-                @Override
-                public void afterTextChanged(Editable s) {
-
-                }
-            };
-            notesTitle.addTextChangedListener(textWatcherTitle);
-        }
-        catch(Exception e){
-            Toast.makeText(getApplicationContext(), "The title is blank", Toast.LENGTH_LONG).show();
-
-        }
-
-        TextWatcher notesBodytextWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-
-                if(charSequence == ""){
-                    ViewListOfNotesActivity.notesBodies.set(noteId, "Text"+noteId);
-                }
-
-                else{
-                    //ViewListOfNotesActivity.notesTitles.add("Text0");
-                    ViewListOfNotesActivity.notesBodies.set(noteId,charSequence+ "");
-                }
-
-                if(noteId  > 0) {
-                    ViewListOfNotesActivity.arrayAdapter.notifyDataSetChanged();
-
-                }
-            }
-
-             @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        };
-        notesBody.addTextChangedListener(notesBodytextWatcher);
     }
 
 
@@ -144,24 +90,114 @@ public class TakeNotesActivity extends AppCompatActivity {
         }
         if(id == R.id.saveNotes) {
 
-            String currentEvent = getCalendarDetails.getCurrentEvent();
+            if(notesTitle.getText().toString().equals("")){
+                Toast.makeText(getApplicationContext(), "Please give the notes Title", Toast.LENGTH_LONG).show();
+            }
+            else {
+
             /*
             Ask Permission to go to the calendar App
              */
-            if (currentEvent == null) {
 
-                AlertDialogs alertDialogs = new AlertDialogs(TakeNotesActivity.this);
-                alertDialogs.askPermissionToGoToCalendar();
+            if(ViewListOfNotesActivity.notesTitles.get(noteId).contains(".txt")){
 
-            } else {
-                Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(), "Saved here..", Toast.LENGTH_LONG).show();
+                if(viewListOfNotesActivity.selectedEvent() != null){
+
+
+                    createDirectories.createCourseCodifyFile();
+
+                    createDirectories.createEventFolder(viewListOfNotesActivity.selectedEvent());
+
+                    createDirectories.createSubFolder(viewListOfNotesActivity.selectedEvent(), "Notes");
+                    File newFile = createDirectories.saveMaterial(viewListOfNotesActivity.selectedEvent(), "Notes", notesTitle.getText().toString(), notesBody.getText().toString());
+
+                    Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
+                   // intent.putExtra("CalendarEvent", viewListOfNotesActivity.selectedEvent());
+                    startActivity(intent);
+                    Toast.makeText(getApplicationContext(), "Saved here..", Toast.LENGTH_LONG).show();
+
+                }
+
+                else{
+
+                    Log.i("Selected Event", "is null");
+                }
+                //String fileFullPath = "/CourseCodify/"+
+            }
+              else{
+                currentEvent = getCalendarDetails.getCurrentEvent();
+//                Log.i("CurrentEvent", currentEvent);
+                if (currentEvent == null) {
+
+                    AlertDialogs alertDialogs = new AlertDialogs(TakeNotesActivity.this);
+                    alertDialogs.askPermissionToGoToCalendar();
+                    createdEvent= true;
+
+                } else {
+                    //Added on 20/12/2017 creating coursecodify if it doesnot exist
+
+                    //if(notesTitle)
+                    createDirectories.createCourseCodifyFile();
+
+                    createDirectories.createEventFolder(currentEvent);
+
+                    createDirectories.createSubFolder(currentEvent, "Notes");
+                    File newFile = createDirectories.saveMaterial(currentEvent, "Notes", notesTitle.getText().toString()+".txt", notesBody.getText().toString() );
+                    Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
+                    intent.putExtra("CalendarEvent", currentEvent);
+                    Log.i("Selected ele", currentEvent);
+                    startActivity(intent);
+                    Toast.makeText(getApplicationContext(), "Saved here..", Toast.LENGTH_LONG).show();
+
+                }
 
             }
+            }
+        }
+
+        if(id == R.id.goToViewNotes){
+            Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
+            //intent.putExtra("CalendarEvent", viewListOfNotesActivity.selectedEvent());
+            startActivity(intent);
+
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_FileAccess_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                // close the app
+                Toast.makeText(TakeNotesActivity.this, "Sorry!!!, you can't use this app without granting permission", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(createdEvent) {
+            currentEvent = getCalendarDetails.getCurrentEvent();
+            if (!notesTitle.equals("") || !notesBody.equals("")) {
+                if (currentEvent != null) {
+                    createDirectories.createCourseCodifyFile();
+                    createDirectories.createEventFolder(currentEvent);
+                    createDirectories.createSubFolder(currentEvent, "Notes");
+                    createDirectories.createNoMedia();
+                    File notesName = createDirectories.saveMaterial(currentEvent, "Notes", notesTitle.getText().toString() + ".txt", notesBody.getText().toString());
+
+
+                }
+            }
+            createdEvent = false;
+        }
+    }
+
+
 
 
 }

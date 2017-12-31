@@ -241,7 +241,7 @@ public class GetCalendarDetails {
 
     }
 
-    public void goToCalendar(){
+    public void goToCalendar(Context context){
 
         long startMills = System.currentTimeMillis();
         Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();

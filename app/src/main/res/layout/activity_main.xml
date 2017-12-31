@@ -16,6 +16,7 @@
         android:layout_alignParentTop="true"
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="4dp"
+
         android:background= "#B0E0E6"/>
 
     <TextView
@@ -23,7 +24,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/todays_event"
-        android:paddingTop="40dp"
+        android:textSize="40dp"
+        android:textColor="@color/blue"
+        android:background="#F0F8FF"
         android:textColorHighlight="@color/colorPrimary"
         android:id="@+id/todayEvent"/>
 
@@ -33,7 +36,7 @@
       android:layout_height="match_parent"
       android:layout_below="@id/todayEvent"
       android:id="@+id/expandable_LV"
-      android:background="@color/silver"
+      android:background="#F0F8FF"
       android:divider="#00000000"
       ></ExpandableListView>
 

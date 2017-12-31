@@ -38,7 +38,7 @@ public class AlertDialogs {
                         Log.i("OnClick","Create Event is pressed");
                         //Log.i("OnClick",getByteOfImage().length+"");
 
-                        goToCalendar();
+                        getCalendarDetails.goToCalendar(context);
                         Toast.makeText(context, "Save Pressed", Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -55,18 +55,8 @@ public class AlertDialogs {
         alertDialog.show();
     }
 
- 
-
-    public void goToCalendar(){
-
-        long startMills = System.currentTimeMillis();
-        Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
-        builder.appendPath("time");
-        ContentUris.appendId(builder, startMills);
-        Intent intent = new Intent(Intent.ACTION_VIEW).setData(builder.build());
-        context.startActivity(intent);
 
 
-    }
+
 
 }

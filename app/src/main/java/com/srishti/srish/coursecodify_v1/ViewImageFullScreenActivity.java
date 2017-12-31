@@ -15,7 +15,7 @@ public class ViewImageFullScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_image_full_screen);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
         Bitmap bitmap;
         byte[] byteArray = getIntent().getByteArrayExtra("ImageView");
         bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
