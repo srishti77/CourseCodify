@@ -1,6 +1,7 @@
 package com.srishti.srish.coursecodify_v1;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -92,19 +93,39 @@ import java.util.ArrayList;
     }
 
     @Override
-    public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
+    public View getChildView(final int i, final int i1, boolean b, View view, ViewGroup viewGroup) {
          if(view == null){
 
              LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
              view = inflater.inflate(R.layout.subdirectory_events_layout_expandable, null);
          }
 
-         TextView childName = (TextView) view.findViewById(R.id.eventSubdirectory);
+         final TextView childName = (TextView) view.findViewById(R.id.eventSubdirectory);
         childName.setText(subdirectoryName.get(i1));
 
         TextView childCount = (TextView) view.findViewById(R.id.countChildItem);
         Log.i( "Event Name --:"+ eventName.getText(), childName.getText()+"");
-        childCount.setText(" "+createDirectories.readAllDirectoryName(eventName.getText().toString(),childName.getText().toString()).size());
+        childCount.setText("   ["+createDirectories.readAllDirectoryName(eventName.getText().toString(),childName.getText().toString()).size()+"]");
+
+        childName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(childName.getText().toString().equals("Images")){
+                    Intent intent = new Intent(view.getContext() , ViewListOfPicturesActivity.class);
+                    intent.putExtra("CurrentCalendarEvent",groupName.get(i) );
+                    context.startActivity(intent);
+                }
+                else if(childName.getText().toString().equals("Notes")){
+
+                    Intent intent = new Intent(view.getContext() , ViewListOfNotesActivity.class);
+                    intent.putExtra("CalendarEvent",groupName.get(i) );
+                    context.startActivity(intent);
+
+                }
+
+            }
+        });
+
         return view;
     }
 

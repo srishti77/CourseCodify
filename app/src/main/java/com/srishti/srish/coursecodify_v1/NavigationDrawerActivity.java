@@ -8,13 +8,13 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.MenuInflater;
-import android.view.TextureView;
+
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,26 +24,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+
 import android.widget.CalendarView;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-/*
-This is our main class.
-It consist of calendar and the list of today's event
- */
+
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-    //Lets try
 
     DirectoryExpandableListAdapter directoryExpandableListAdapter;
     static ArrayList<String> listOfEvents_Today = new ArrayList<String>();
@@ -52,7 +46,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     static List<String> calendarNamesList = new ArrayList<String>();
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
-    //private static final int REQUEST_CAMERA_PERMISSION = 200;
+    private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 17;
     SharedPreferences sharedPreferences;
     boolean firstInstallation = true;
 
@@ -60,6 +54,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     final GetCalendarDetails getCalendarName = new GetCalendarDetails(NavigationDrawerActivity.this);
 
     static boolean calendarPermission = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,10 +71,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
-            //Here we add Main Activity
-
         listOfSubDirectory.clear();
         listOfSubDirectory.add("Images");
         listOfSubDirectory.add("Notes");
@@ -89,11 +80,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{
-                                Manifest.permission.READ_CALENDAR}, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+                                Manifest.permission.READ_CALENDAR, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 
         }
-
-
 
 
 
@@ -132,24 +121,45 @@ public class NavigationDrawerActivity extends AppCompatActivity
             if (!getCalendarName.getAllCalendarName().isEmpty()) {
                 Log.i("sharedP selectedIndex", (sharedPreferences.getInt("SelectedIndex", -1) - 1)+"");
                 listOfEvents_Today.clear();
-                listOfEvents_Today.addAll(getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1)));
+                listOfEvents_Today.addAll(getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1), null));
                 directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
 
             }
+        final ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.expandable_LV);
+
+        expandableListView.setAdapter(directoryExpandableListAdapter);
 
         CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView);
 
-        ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.expandable_LV);
+        calendarView.setDate(Calendar.getInstance().getTimeInMillis(),true,true);
 
-        expandableListView.setAdapter(directoryExpandableListAdapter);
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
+                Log.i("Date change", "Listener is called");
+                Log.i(" selected date"+i+" ", i1+" "+ i2);
+                Time time = new Time();
+                time.set(00,00,01,i2,i1,i);
+
+
+                listOfEvents_Today.clear();
+                    listOfEvents_Today.addAll(getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1), time));
+                   // directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
+                directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
+                expandableListView.setAdapter(directoryExpandableListAdapter);
+
+
+            }
+        });
+
+
 
         TextView textView = (TextView) findViewById(R.id.todayEvent);
 
         textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1)-1));
-                    getCalendarName.getCurrentEvent();
+                 getCalendarName.getCurrentEvent();
                 }
         });
 
@@ -167,7 +177,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.setting_menu, menu);
         return true;
@@ -175,12 +185,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         switch (item.getItemId()){
             case R.id.settings:
                 Intent intent = new Intent(NavigationDrawerActivity.this, SettingActivity.class);
@@ -215,6 +222,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
           startActivity(intent);
 
         } else if (id == R.id.nav_manage) {
+          Intent intent = new Intent(NavigationDrawerActivity.this, RecordingActivity.class);
+          startActivity(intent);
 
         } else if (id == R.id.nav_share) {
 
@@ -233,7 +242,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_CONTACTS:
-                // If request is cancelled, the result arrays are empty.
+
                 if (grantResults.length > 0
                         && grantResults[0] == PERMISSION_GRANTED) {
 
@@ -257,11 +266,37 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 }
                 break;
 
+            case MY_PERMISSIONS_REQUEST_RECORD_AUDIO:
+                if (grantResults.length > 0
+                        && grantResults[0] == PERMISSION_GRANTED) {
 
+                    Log.i("Permission Granted","Permission Granted");
+
+                } else {
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO))
+                    {
+                        new AlertDialog.Builder(this)
+                                .setTitle("RECORD Permission")
+                                .setMessage("You need to grant RECORD Permission").show();
+                    }
+                    else {
+
+
+                        new AlertDialog.Builder(this)
+                                .setTitle("RECORD Permission Denied")
+                                .setMessage("You need to grant RECORD Permission Denied").show();
+                    }
+
+                }
+                break;
 
         }
     }
 
 
+    @Override
+    protected void onResume() {
 
+        super.onResume();
+    }
 }

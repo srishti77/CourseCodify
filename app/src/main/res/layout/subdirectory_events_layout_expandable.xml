@@ -2,27 +2,23 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:background="@color/white"
    >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:textSize="20dp"
+        android:textSize="30dp"
         android:layout_marginLeft="10dp"
-
         android:textStyle="bold|italic"
-        android:background="@color/white"
         android:paddingLeft="50dp"
-
         android:id="@+id/eventSubdirectory"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="20dp"
-        android:background="@color/white"
-
+        android:layout_marginTop="10dp"
+        android:textSize="15dp"
         android:layout_toRightOf="@+id/eventSubdirectory"
         android:id="@+id/countChildItem"/>
 </RelativeLayout>

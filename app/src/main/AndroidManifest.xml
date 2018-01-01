@@ -10,6 +10,7 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -41,16 +42,18 @@
             android:name=".ViewImageFullScreenActivity"
             android:parentActivityName=".ViewListOfPicturesActivity"
             android:theme="@style/AppTheme" />
-
-        <activity android:name=".TakeNotesActivity"
+        <activity
+            android:name=".TakeNotesActivity"
             android:parentActivityName=".NavigationDrawerActivity"
-            android:theme="@style/AppTheme"/>
-
-        <activity android:name=".ViewListOfNotesActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ViewListOfNotesActivity"
             android:parentActivityName=".TakeNotesActivity"
-            android:theme="@style/AppTheme"></activity>
-
-
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".RecordingActivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".ViewListOfRecordingsActivity"></activity>
     </application>
 
 </manifest>

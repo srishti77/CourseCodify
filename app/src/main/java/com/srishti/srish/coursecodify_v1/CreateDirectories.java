@@ -110,6 +110,7 @@ public class CreateDirectories {
                 Log.i("Content is written in: ", fileName+"--");
 
                 }
+                if(fileContent != null)
             writeContentIntoFile(fileContent, mediaStorageDir);
 
         }

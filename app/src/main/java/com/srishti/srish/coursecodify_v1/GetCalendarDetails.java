@@ -156,20 +156,24 @@ public class GetCalendarDetails {
 
     */
 
-    public ArrayList<String> getevents( String CalendarName){
+    public ArrayList<String> getevents( String CalendarName, Time time){
 
         Cursor cur = null;
         ContentResolver cr = context.getContentResolver();
+        if(time == null){
+            time = new Time();
+            time.setToNow();
+            Log.i("Time is", time+"");
+            time.set(00, 00, 01, time.monthDay, time.month, time.year);
+        }
 
-        Time t = new Time();
-        t.setToNow();
-        t.set(00, 00, 01, t.monthDay, t.month, t.year);
-        Log.i("Current time", t+"");
-        long dtStart = t.toMillis(false);
-        Log.i("Current time", dtStart+"");
-        t.set(59, 59, 23, t.monthDay, t.month, t.year);
-        long dtEnd = t.toMillis(false);
-        Log.i("Endday", Long.toString(dtEnd));
+
+        time.set(00, 00, 01, time.monthDay, time.month, time.year);
+
+        long dtStart = time.toMillis(false);
+
+        time.set(59, 59, 23, time.monthDay, time.month, time.year);
+        long dtEnd = time.toMillis(false);
 
         Uri.Builder uri = CalendarContract.Instances.CONTENT_URI.buildUpon();
         ContentUris.appendId(uri, dtStart);
