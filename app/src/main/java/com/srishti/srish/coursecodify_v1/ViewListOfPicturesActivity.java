@@ -55,6 +55,7 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
         ArrayAdapter<String> arrayAdapterListOfEvents = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,listOfevents );
         arrayAdapterListOfEvents.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerListOfEvents.setAdapter(arrayAdapterListOfEvents);
+
         final ArrayList<String> imageName = new ArrayList<>();
 
         Intent intent = getIntent();
@@ -103,26 +104,6 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
             }
         } );
 
-           /* if(createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images" )!= null){
-
-            for (File file : createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images").listFiles()) {
-                if (file.isFile()) {
-                    Log.i("Picture Name:", file.getName());
-                    drawableImage = Drawable.createFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images/" + file.getName());
-                    Log.i("DrawableImages", drawableImage + "");
-
-                    drawables.add(drawableImage);
-
-                    nameOfFiles.add(file.getName());
-
-
-                    imageName.add(file.getName());
-                }
-            }
-        }
-        else{
-            Toast.makeText(getApplicationContext(), "No element to display", Toast.LENGTH_LONG).show();
-        }*/
 
         final ListView listView = (ListView)  findViewById(R.id.listOfImage);
         arrayAdapter = new ListSingleImageAdapter(this, drawables, imageName);
