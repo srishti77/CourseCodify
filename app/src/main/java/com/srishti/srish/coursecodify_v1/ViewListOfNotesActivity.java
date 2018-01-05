@@ -39,14 +39,11 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_list_of_notes);
 
-        //dropdown to select the event
         spinnerListOfEvents = (Spinner) findViewById(R.id.notes_listOfEvents);
         List listOfevents = new ArrayList<>();
 
         Intent intent = getIntent();
         String event = intent.getStringExtra("CalendarEvent");
-
-
 
         listOfevents.addAll(createDirectories.readAllDirectoryName(null, null));
         Log.i("Count of Events", listOfevents.size()+ "");
@@ -101,9 +98,7 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
-        } );
-
-
+        });
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
@@ -141,11 +136,6 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
                             Log.i("Popup item", item+"");
                             ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
                             Log.i("Check Shareaction ", shareActionProvider+"");
-                           // Bitmap bitmap = ((BitmapDrawable) drawables.get(position)).getBitmap();
-                          //  String path = MediaStore.Images.Media.insertImage(ViewListOfPicturesActivity.this.getContentResolver(),
-                               //     bitmap, "Design", null);
-                           // Uri uri = Uri.parse(path);
-
                             Intent myShareIntent = new Intent();
                             myShareIntent.setAction(Intent.ACTION_SEND);
                             myShareIntent.setType("text/plain");

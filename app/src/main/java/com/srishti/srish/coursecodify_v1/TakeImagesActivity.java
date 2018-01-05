@@ -391,7 +391,7 @@ public class TakeImagesActivity extends AppCompatActivity {
         else {
            // Log.i("GetOutputMediaFile", createDirectories.createCourseCodifyFile());
             createDirectories.createCourseCodifyFile();
-            createDirectories.createNoMedia();
+
              mediaStorageDir = new File(
                     Environment
                             .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
@@ -399,6 +399,7 @@ public class TakeImagesActivity extends AppCompatActivity {
             if (!mediaStorageDir.exists()) {
                 Log.i("Make ","Directory");
                 mediaStorageDir.mkdirs();
+                createDirectories.createNoMedia();
 
 
             }

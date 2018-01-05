@@ -4,17 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="20dp"
     tools:context="com.srishti.srish.coursecodify_v1.ViewListOfPicturesActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageName"
+        android:textStyle="bold"
         android:layout_toRightOf="@+id/imageVIew"/>
 
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="80dp"
+        android:layout_height="70dp"
         android:id="@+id/imageVIew"
         />
 

@@ -86,8 +86,6 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
                             drawables.add(drawableImage);
 
                             nameOfFiles.add(file.getName());
-
-
                             imageName.add(file.getName());
                             arrayAdapter.notifyDataSetChanged();
 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.srishti.srish.coursecodify_v1.ViewAllMaterialActivity">
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="50dp"
+        android:id="@+id/listOfAllEvents"
+        android:background="@mipmap/spinnerbackground"
+        />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/listOfAllEvents"
+        android:id="@+id/listOfRecordings"
+        ></ListView>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/listOfRecordings"
+        android:id="@+id/listOfNotes"
+        ></ListView>
+
+    <ListView
+        android:id="@+id/listOfImages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@+id/listOfNotes"
+        ></ListView>
+
+</RelativeLayout>

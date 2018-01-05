@@ -52,8 +52,14 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".RecordingActivity"
+            android:parentActivityName=".NavigationDrawerActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".ViewListOfRecordingsActivity"></activity>
+        <activity
+            android:name=".ViewListOfRecordingsActivity"
+            android:parentActivityName=".RecordingActivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".MakeIconActivity" />
+        <activity android:name=".ViewAllMaterialActivity"></activity>
     </application>
 
 </manifest>

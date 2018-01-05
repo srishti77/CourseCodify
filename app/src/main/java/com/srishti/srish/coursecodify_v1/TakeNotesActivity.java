@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -110,6 +111,7 @@ public class TakeNotesActivity extends AppCompatActivity {
 
                     createDirectories.createSubFolder(viewListOfNotesActivity.selectedEvent(), "Notes");
                     File newFile = createDirectories.saveMaterial(viewListOfNotesActivity.selectedEvent(), "Notes", notesTitle.getText().toString(), notesBody.getText().toString());
+                    MediaScannerConnection.scanFile(TakeNotesActivity.this, new String[]{newFile.toString()}, null, null);
 
                     Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
                    // intent.putExtra("CalendarEvent", viewListOfNotesActivity.selectedEvent());
@@ -143,6 +145,8 @@ public class TakeNotesActivity extends AppCompatActivity {
 
                     createDirectories.createSubFolder(currentEvent, "Notes");
                     File newFile = createDirectories.saveMaterial(currentEvent, "Notes", notesTitle.getText().toString()+".txt", notesBody.getText().toString() );
+                    MediaScannerConnection.scanFile(TakeNotesActivity.this, new String[]{newFile.toString()}, null, null);
+
                     Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
                     intent.putExtra("CalendarEvent", currentEvent);
                     Log.i("Selected ele", currentEvent);
@@ -189,6 +193,7 @@ public class TakeNotesActivity extends AppCompatActivity {
                     createDirectories.createSubFolder(currentEvent, "Notes");
                     createDirectories.createNoMedia();
                     File notesName = createDirectories.saveMaterial(currentEvent, "Notes", notesTitle.getText().toString() + ".txt", notesBody.getText().toString());
+                    MediaScannerConnection.scanFile(TakeNotesActivity.this, new String[]{notesName.toString()}, null, null);
 
 
                 }

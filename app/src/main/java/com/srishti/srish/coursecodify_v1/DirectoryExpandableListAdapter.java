@@ -123,6 +123,23 @@ import java.util.ArrayList;
 
                 }
 
+                else if(childName.getText().toString().equals("Recordings")){
+
+                    Intent intent = new Intent(view.getContext() , ViewListOfRecordingsActivity.class);
+                    intent.putExtra("CalendarEvent",groupName.get(i) );
+                    context.startActivity(intent);
+
+                }
+
+                else if(childName.getText().toString().equals("All Materials")){
+
+                    Intent intent = new Intent(view.getContext() , ViewAllMaterialActivity.class);
+                    intent.putExtra("CalendarEvent",groupName.get(i) );
+                    intent.putExtra("MaterialType", "All Materials");
+                    context.startActivity(intent);
+
+                }
+
             }
         });
 

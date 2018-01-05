@@ -4,11 +4,9 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.format.Time;
@@ -72,21 +70,34 @@ public class NavigationDrawerActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         listOfSubDirectory.clear();
+        listOfSubDirectory.add("All Materials");
         listOfSubDirectory.add("Images");
         listOfSubDirectory.add("Notes");
         listOfSubDirectory.add("Recordings");
 
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PERMISSION_GRANTED) {
+        if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PERMISSION_GRANTED) ||
+                (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) != PERMISSION_GRANTED)||
+                (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PERMISSION_GRANTED) ||
+                (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED) ||
+                (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PERMISSION_GRANTED) ||
+                (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PERMISSION_GRANTED))
+
+        {
                 ActivityCompat.requestPermissions(this,
                         new String[]{
-                                Manifest.permission.READ_CALENDAR, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+                                Manifest.permission.READ_CALENDAR,
+
+                                Manifest.permission.RECORD_AUDIO,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.CAMERA },  MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 
         }
 
 
 
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(NavigationDrawerActivity.this);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(NavigationDrawerActivity.this);
             firstInstallation = sharedPreferences.getBoolean("FIRST_RUN", false);
 
             if (!firstInstallation) {
@@ -118,13 +129,21 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         calendarNamesList.clear();
         calendarNamesList.addAll(getCalendarName.getAllCalendarName());
-            if (!getCalendarName.getAllCalendarName().isEmpty()) {
+        if (!getCalendarName.getAllCalendarName().isEmpty()) {
                 Log.i("sharedP selectedIndex", (sharedPreferences.getInt("SelectedIndex", -1) - 1)+"");
                 listOfEvents_Today.clear();
                 listOfEvents_Today.addAll(getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1), null));
                 directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
 
-            }
+        }
+
+
+        View hView = navigationView.getHeaderView(0);
+        TextView textView1 = (TextView) hView.findViewById(R.id.CalendarName);
+
+       if(!calendarNamesList.isEmpty())
+       textView1.setText(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1));
+
         final ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.expandable_LV);
 
         expandableListView.setAdapter(directoryExpandableListAdapter);
@@ -143,7 +162,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
 
                 listOfEvents_Today.clear();
-                    listOfEvents_Today.addAll(getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1), time));
+                listOfEvents_Today.addAll(getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1), time));
                    // directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
                 directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
                 expandableListView.setAdapter(directoryExpandableListAdapter);
@@ -221,11 +240,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
           Intent intent = new Intent(NavigationDrawerActivity.this, TakeNotesActivity.class);
           startActivity(intent);
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_audioRecord) {
           Intent intent = new Intent(NavigationDrawerActivity.this, RecordingActivity.class);
           startActivity(intent);
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_setting) {
 
         } else if (id == R.id.nav_Forum) {
 

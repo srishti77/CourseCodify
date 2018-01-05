@@ -1,8 +1,10 @@
 package com.srishti.srish.coursecodify_v1;
 
 import android.Manifest;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -12,6 +14,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -28,48 +32,37 @@ public class RecordingActivity extends AppCompatActivity {
 
     MediaRecorder mediaRecorder;
     CreateDirectories createDirectories = new CreateDirectories();
-    private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 17;
     GetCalendarDetails getCalendarDetails = new GetCalendarDetails(RecordingActivity.this);
-
     String currentEvent = null;
     boolean createdEvent = false;
     boolean onRecordStart = true;
-    Button playButton;
     ImageView microphoneRecordImage;
     TextView timerValue;
-
     private long startTime = 0L;
     long timeInMilliseconds = 0L;
     long timeSwapBuff = 0L;
     long updatedTime = 0L;
     final Handler customHandler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
-
         timerValue = (TextView) findViewById(R.id.timerValue);
-
-
         microphoneRecordImage = (ImageView) findViewById(R.id.playOrpause);
-
-
-        playButton = (Button) findViewById(R.id.play);
-        createDirectories.createSubFolder("Srishti", "Recordings");
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-
+        currentEvent = getCalendarDetails.getCurrentEvent();
         final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
                 .format(new Date());
-
 
         microphoneRecordImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                currentEvent = getCalendarDetails.getCurrentEvent();
+
                 try {
                   Log.i("Current Drawable", microphoneRecordImage.getDrawable()+"");
                     if(currentEvent == null){
@@ -105,8 +98,9 @@ public class RecordingActivity extends AppCompatActivity {
                             mediaRecorder.stop();
                             mediaRecorder.release();
                             mediaRecorder = null;
+                            MediaScannerConnection.scanFile(RecordingActivity.this, new String[]{}, null, null);
 
-                            playButton.setEnabled(true);
+
                             Toast.makeText(getApplicationContext(), "Audio Recordering successfully done", Toast.LENGTH_LONG).show();
 
                         }
@@ -118,26 +112,6 @@ public class RecordingActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-            }
-        });
-
-
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MediaPlayer mediaPlayer = new MediaPlayer();
-                try {
-                    String outputFile= Environment
-                            .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+ "/CourseCodify/" +currentEvent+"/Recordings/"+ "record"+ timeStamp+".3gp";
-
-                    mediaPlayer.setDataSource(outputFile);
-                    mediaPlayer.prepare();
-                    mediaPlayer.start();
-
-                    Toast.makeText(getApplicationContext(), "Playing the media", Toast.LENGTH_LONG).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         });
 
@@ -170,5 +144,27 @@ public class RecordingActivity extends AppCompatActivity {
 
             Toast.makeText(getApplicationContext(),"You can start Recording by pressing Record button", Toast.LENGTH_LONG ).show();
         }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.view_list_of_images,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id){
+            case R.id.viewlistOfPicture:
+                Log.i("ViewRecordingActivity", "Called");
+                Intent intent = new Intent(RecordingActivity.this, ViewListOfRecordingsActivity.class);
+                intent.putExtra("CalendarEvent", currentEvent);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

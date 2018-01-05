@@ -151,6 +151,7 @@ public class CreateDirectories {
             String state = Environment.getExternalStorageState();
             if (Environment.MEDIA_MOUNTED.equals(state)) {
 
+
                 if(event == null){
                       mediaStorageDir = new File(
                             Environment
@@ -158,25 +159,16 @@ public class CreateDirectories {
 
                 }
 
-                else if (event != null && materialType != null) {
+                else if (event != null && materialType != null ) {
                     mediaStorageDir = new File(
                             Environment
                                     .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "CourseCodify/"+event+"/"+materialType);
 
 
                 }
+                listOfAllDirectories.clear();
+                listOfAllDirectories = readAllFiles(mediaStorageDir, listOfAllDirectories);
 
-             if(mediaStorageDir.exists()){
-                    Log.i("CourseCodify", "Exists");
-                 for(File fileName : mediaStorageDir.listFiles()){
-                     Log.i("Has a fileName", fileName.getName());
-
-                         listOfAllDirectories.add(fileName.getName());
-
-                 }
-
-                 Log.i( "Count of list: "+listOfAllDirectories.size(), "");
-             }
             }
         }
         catch (Exception e){
@@ -187,6 +179,22 @@ public class CreateDirectories {
         return listOfAllDirectories;
     }
 
+    public List readAllFiles(File mediaStorageDir, List listOfAllDirectories){
+        listOfAllDirectories = new ArrayList();
+        if(mediaStorageDir.exists()){
+
+            for(File fileName : mediaStorageDir.listFiles()){
+
+
+                listOfAllDirectories.add(fileName.getName());
+
+            }
+
+            Log.i( "Count of list: "+listOfAllDirectories.size(), "");
+        }
+
+        return listOfAllDirectories;
+    }
 
     public StringBuffer readContentOfNotesFile(String file){
        // List<String> listOfContents = new ArrayList<String>();
