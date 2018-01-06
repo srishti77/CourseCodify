@@ -1,41 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.srishti.srish.coursecodify_v1.ViewAllMaterialActivity">
 
     <Spinner
         android:layout_width="match_parent"
-        android:layout_marginTop="10dp"
+        android:layout_margin="10dp"
         android:layout_height="50dp"
         android:id="@+id/listOfAllEvents"
         android:background="@mipmap/spinnerbackground"
         />
 
-    <ListView
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_below="@+id/listOfAllEvents"
-        android:id="@+id/listOfRecordings"
-        ></ListView>
+        android:layout_margin="10dp"
+        android:id="@+id/RecordingsTitle"/>
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_below="@+id/listOfRecordings"
-        android:id="@+id/listOfNotes"
+        android:layout_margin="10dp"
+
+        android:divider = "@color/silver"
+        android:dividerHeight="2dp"
+        android:background="@drawable/border_listview"
+        android:id="@+id/listOfRecordings"
         ></ListView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:id="@+id/NotesTitle"
+      />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:divider = "@color/silver"
+        android:dividerHeight="2dp"
+        android:id="@+id/listOfNotes"
+        android:background="@drawable/border_listview"
+
+        ></ListView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textSize="15sp"
+        android:id="@+id/ImagesTitle"/>
 
     <ListView
         android:id="@+id/listOfImages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:layout_below="@+id/listOfNotes"
+        android:layout_margin="10dp"
+        android:divider = "@color/silver"
+        android:dividerHeight="2dp"
+        android:background="@drawable/border_listview"
         ></ListView>
 
-</RelativeLayout>
+</LinearLayout>

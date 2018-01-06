@@ -99,8 +99,7 @@ public class TakeImagesActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getPicture();
-                // Intent intent = new Intent(MainActivity.this, Main2Activity.class);
-                //startActivity(intent);
+
             }
         });
     }
@@ -224,15 +223,11 @@ public class TakeImagesActivity extends AppCompatActivity {
                 }
             },handler);
 
-
-
-
         }
         catch (Exception e){
 
             e.printStackTrace();
         }
-
 
     }
 
@@ -247,17 +242,14 @@ public class TakeImagesActivity extends AppCompatActivity {
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map=characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             previewsize=map.getOutputSizes(SurfaceTexture.class)[0];
-            Log.i("Preview Size Width", previewsize.getWidth()+"");
-            Log.i("Preview Size Height", previewsize.getHeight()+"");
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(TakeImagesActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
                 return;
             }
             manager.openCamera(cameraId,stateCallback,null);
         }catch (Exception e)
         {
-            Log.i("Error Msg", "openCamera Failed");
             e.printStackTrace();
         }
     }
@@ -268,8 +260,6 @@ public class TakeImagesActivity extends AppCompatActivity {
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
 
             openCamera();
-
-
 
         }
         @Override
@@ -323,17 +313,13 @@ public class TakeImagesActivity extends AppCompatActivity {
             return;
         }
 
-        //texture.setDefaultBufferSize(previewsize.getWidth(),previewsize.getHeight());
-        Log.i("Preview Width", previewsize.getWidth()+"");
-        Log.i("Preview Height", previewsize.getHeight()+"");
-
 
         texture.setDefaultBufferSize(900, 900);
         Surface surface=new Surface(texture);
         try
         {
             previewBuilder=cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            Log.i("PreviewBuilder","here it is");
+
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -389,25 +375,21 @@ public class TakeImagesActivity extends AppCompatActivity {
            return mediaStorageDir;
         }
         else {
-           // Log.i("GetOutputMediaFile", createDirectories.createCourseCodifyFile());
+
             createDirectories.createCourseCodifyFile();
 
              mediaStorageDir = new File(
                     Environment
                             .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
                      createDirectories.createCourseCodifyFile() + "/" + getCalendarDetails.getCurrentEvent()+"/Images");
-            if (!mediaStorageDir.exists()) {
-                Log.i("Make ","Directory");
-                mediaStorageDir.mkdirs();
-                createDirectories.createNoMedia();
 
+            if (!mediaStorageDir.exists()) {
+                mediaStorageDir.mkdirs();
+                createDirectories.createNoMedia(mediaStorageDir.getPath());
 
             }
-
-
             return mediaStorageDir;
         }
-
     }
 
     public File getImageName(){

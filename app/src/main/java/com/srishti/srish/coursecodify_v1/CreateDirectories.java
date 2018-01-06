@@ -18,19 +18,33 @@ import java.util.List;
 
 public class CreateDirectories {
     //static int count = 0;
-    public void createNoMedia(){
+    public void createNoMedia(String directory){
 
-        File mediaStorageDir = new File(
-                Environment
-                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-                "MyCameraApp" + "/.nomedia");
-        if (!mediaStorageDir.exists()) {
-            mediaStorageDir.mkdirs();
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("MyCameraApp .nomedia", "failed to create directory");
+        try{
 
+            Log.i("Nomedia","created");
+            File mediaStorageDir = new File(directory );
+            File nomediaFile = new File(mediaStorageDir.getPath()+"/.nomedia");
+            nomediaFile.createNewFile();
+
+           /* if (!mediaStorageDir.exists()) {
+                mediaStorageDir.mkdirs();
             }
+                if (!mediaStorageDir.mkdirs()) {
+                    Log.d("MyCameraApp .nomedia", "failed to create directory");
+                    return;
+
+                }
+
+                else{
+                File nomediaFile = new File(mediaStorageDir.getPath()+"/.nomedia");
+                nomediaFile.createNewFile();
+                }*/
         }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     public String createCourseCodifyFile(){
@@ -66,11 +80,7 @@ public class CreateDirectories {
         return mediaStorageDir.getName();
     }
 
-
-
     public String createSubFolder(String event, String typeOfMaterial){
-
-
 
         File mediaStorageDir = new File(
                 Environment
@@ -100,17 +110,12 @@ public class CreateDirectories {
                     Environment
                             .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "CourseCodify/"+ event + "/"+ typeOfMaterial +"/" + fileName);
 
-
             if(!mediaStorageDir.exists()){
 
                 mediaStorageDir.createNewFile();
-                Log.i("New fileName","created");
 
-
-                Log.i("Content is written in: ", fileName+"--");
-
-                }
-                if(fileContent != null)
+            }
+            if(fileContent != null)
             writeContentIntoFile(fileContent, mediaStorageDir);
 
         }

@@ -1,12 +1,15 @@
 package com.srishti.srish.coursecodify_v1;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -74,7 +77,7 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
                 Log.i("File Name:", ViewListOfNotesActivity.notesTitles.get(i));
 
                 String notesContent = createDirectories.readContentOfNotesFile(spinnerListOfEvents.getSelectedItem()+"/Notes/"+ViewListOfNotesActivity.notesTitles.get(i)).toString();
-                intent.putExtra("NoteId", i);
+                intent.putExtra("NoteName", ViewListOfNotesActivity.notesTitles.get(i)+"");
                 intent.putExtra("NotesContent", notesContent);
                 startActivity(intent);
             }
@@ -86,9 +89,8 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Log.i("OnChange Listener", "called");
+
                 notesTitles.clear();
-                Log.i("selectedItem from list", spinnerListOfEvents.getSelectedItem()+ "");
                 notesTitles.addAll(createDirectories.readAllDirectoryName(spinnerListOfEvents.getSelectedItem()+ "", "Notes"));
 
                 arrayAdapter.notifyDataSetChanged();
@@ -114,33 +116,14 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
                         if(id == R.id.delete){
-                            Log.i("Delete Position", position+"");
-                            Log.i("CountImageName Array",notesTitles.size()+"" );
-                            Log.i("To be Deleted", notesTitles.get(position));
-                            File directory = createDirectories.getCurrentFile("CourseCodify/"+spinnerListOfEvents.getSelectedItem()+"/Notes");
-                           for(File file : directory.listFiles()){
-                               Log.i("File Name", file.getName());
-                                if(notesTitles.get(position).compareTo(file.getName()) == 0){
-                                    Log.i("Deleted Item", notesTitles.get(position));
-                                    file.delete();
-                                    notesTitles.remove(position);
-                                }
-                            }
-
+                            deleteNotes( position, selectedEvent(), notesTitles );
 
                             arrayAdapter.notifyDataSetChanged();
                         }
 
                         if(id == R.id.share){
                             item = popupMenu.getMenu().findItem(id);
-                            Log.i("Popup item", item+"");
-                            ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
-                            Log.i("Check Shareaction ", shareActionProvider+"");
-                            Intent myShareIntent = new Intent();
-                            myShareIntent.setAction(Intent.ACTION_SEND);
-                            myShareIntent.setType("text/plain");
-                            myShareIntent.putExtra(Intent.EXTRA_TEXT, createDirectories.readContentOfNotesFile(spinnerListOfEvents.getSelectedItem()+"/Notes/"+ notesTitles.get(position)).toString() );
-                            shareActionProvider.setShareIntent(myShareIntent);
+                            shareNotes(selectedEvent(), notesTitles.get(position), ViewListOfNotesActivity.this);
 
                         }
                         return true;
@@ -158,4 +141,35 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
         selectedEvent = (String)spinnerListOfEvents.getSelectedItem();
         return selectedEvent;
     }
+
+    public void deleteNotes(int position, String event, ArrayList<String> material ){
+
+        File directory = createDirectories.getCurrentFile("CourseCodify/"+event+"/Notes");
+        for(File file : directory.listFiles()){
+
+            if(material.get(position).compareTo(file.getName()) == 0){
+                file.delete();
+                material.remove(position);
+            }
+        }
+
+
+    }
+
+    public void shareNotes( String event, String notesName, Context context){
+
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/CourseCodify/"+event+"/Notes/"+notesName);
+        Intent myShareIntent = new Intent();
+        myShareIntent.setAction(Intent.ACTION_SEND);
+
+
+        Uri fileURI = FileProvider.getUriForFile(context ,"com.srishti.srish.coursecodify_v1", file);
+        Log.i("The path..", fileURI+"");
+        myShareIntent.putExtra(Intent.EXTRA_STREAM, fileURI );
+        myShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        myShareIntent.setType("text/*");
+        startActivity(Intent.createChooser(myShareIntent, "Share"));
+
+    }
+
 }

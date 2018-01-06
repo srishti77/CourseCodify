@@ -72,89 +72,18 @@ public class GetCalendarDetails {
 
             }
 
+            cursor.close();
+            sqLiteDatabase.close();
+           //
+
         }
         catch(Exception e){
             e.printStackTrace();
         }
+
         return calendarNames;
     }
 
-   /* public ArrayList<String> getAllEventsFromPreferredCalendar(String CalendarName) {
-       // String selectedCalendar= "1";
-        Cursor cursorForEvent = null;
-        ContentResolver contentResolver = context.getContentResolver();
-        try{
-            SQLiteDatabase sqLiteDatabase = context.openOrCreateDatabase("MyCalendarDb", MODE_PRIVATE, null);
-            sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS New_MyCalendar_Table (" + "CalendarName VARCHAR," + "CalendarId VARCHAR)");
-
-            Cursor cursor = sqLiteDatabase.rawQuery("select * from New_MyCalendar_Table",null);
-        }
-        catch(Exception e){
-
-        }
-        Uri uri = Uri.parse("content://com.android.calendar/events");
-        String selection = "(" + CalendarContract.Instances.CALENDAR_DISPLAY_NAME + "= ?)";
-        Log.i("Here we are in ", "getting events");
-        String[] selectionArgs = new String[]{CalendarName};
-        cursorForEvent = contentResolver.query(uri, EVENT_PROJECTION, selection, selectionArgs, null);
-
-        Log.i("Lets see events", cursorForEvent.getCount() + "");
-        eventNames.clear();
-        if (cursorForEvent.getCount() > 0) {
-            cursorForEvent.moveToFirst();
-
-            for (int i = 0; i < cursorForEvent.getCount(); i++) {
-
-               // Log.i("", getDate(Long.parseLong(cursorForEvent.getString(1))));
-
-                if ((cursorForEvent.getString(0)) != null && cursorForEvent.getString(1) != null && cursorForEvent.getString(2) != null
-                        &&  getDate(Long.parseLong(cursorForEvent.getString(1))).compareTo(getDate()) == 0
-                        ) {
-
-                    eventNames.add(cursorForEvent.getString(0));
-
-                    Log.i("Event Name", "" + cursorForEvent.getString(0));
-                    Log.i("Start Time", "" + getDate(Long.parseLong(cursorForEvent.getString(1))));
-                   // Log.i("End Time", "" + getDate(Long.parseLong(cursorForEvent.getString(2))));
-
-
-                }
-
-                cursorForEvent.moveToNext();
-            }
-
-
-
-        }
-
- return eventNames;
-}
-
-    public static String getDate(long milliSeconds) {
-        //Change the format to dd/mm/yyy
-        SimpleDateFormat formatter = new SimpleDateFormat(
-                "dd/MM/yyyy");
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        Log.i("Date from Calendar", formatter.format(calendar.getTime())+"");
-        return formatter.format(calendar.getTime());
-    }
-
-    public static String getDate(){
-        SimpleDateFormat formatter = new SimpleDateFormat( "dd/MM/yyyy");
-        Date date = new Date();
-        Log.i("Current time", formatter.format(date)+"");
-      return formatter.format(date);
-    }
-
-    public static String getDate1(){
-        SimpleDateFormat formatter = new SimpleDateFormat( "dd-MM-yy:HH:mm:SS Z");
-        Date date = new Date();
-        Log.i("Current time", formatter.format(date)+"");
-        return formatter.format(date);
-    }
-
-    */
 
     public ArrayList<String> getevents( String CalendarName, Time time){
 
@@ -199,6 +128,7 @@ public class GetCalendarDetails {
             cur.moveToNext();
         }
 
+        cur.close();
         return eventNames;
     }
 
@@ -241,6 +171,7 @@ public class GetCalendarDetails {
             Log.i("End time", cur.getString(cur.getColumnIndex("end")));
         }
 
+        cur.close();
         return  currentEventName;
 
     }

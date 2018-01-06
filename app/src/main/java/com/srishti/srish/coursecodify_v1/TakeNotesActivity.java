@@ -33,7 +33,7 @@ public class TakeNotesActivity extends AppCompatActivity {
 
     GetCalendarDetails getCalendarDetails = new GetCalendarDetails(TakeNotesActivity.this);
     CreateDirectories createDirectories = new CreateDirectories();
-    int noteId;
+    String noteName;
     String notesContent;
     String currentEvent;
     boolean createdEvent = false;
@@ -47,29 +47,22 @@ public class TakeNotesActivity extends AppCompatActivity {
 
         notesTitle = (EditText) findViewById(R.id.titleNotes);
         notesBody = (EditText) findViewById(R.id.notesBody);
-
-
         Intent intent = getIntent();
-        noteId = intent.getIntExtra("NoteId", -1);
+        noteName = intent.getStringExtra("NoteName");
         notesContent = intent.getStringExtra("NotesContent");
-        Log.i("NoteId ", noteId + "");
+        Log.i("NoteId ", noteName + "");
 
-        if (noteId != -1) {
+        if (noteName != null) {
             Log.i("Notes returned", notesContent);
-            notesTitle.setText(ViewListOfNotesActivity.notesTitles.get(noteId).toString());
+            notesTitle.setText(noteName);
             notesBody.setText(notesContent);
         } else {
-            noteId = 0;
+            noteName = "";
             ViewListOfNotesActivity.notesTitles.add("");
             ViewListOfNotesActivity.notesBodies.add("");
         }
 
 
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-
-            ActivityCompat.requestPermissions(TakeNotesActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_FileAccess_PERMISSION);
-            return;
-        }
     }
 
 
@@ -100,21 +93,17 @@ public class TakeNotesActivity extends AppCompatActivity {
             Ask Permission to go to the calendar App
              */
 
-            if(ViewListOfNotesActivity.notesTitles.get(noteId).contains(".txt")){
+            if(noteName.contains(".txt")){
 
                 if(viewListOfNotesActivity.selectedEvent() != null){
 
 
                     createDirectories.createCourseCodifyFile();
-
                     createDirectories.createEventFolder(viewListOfNotesActivity.selectedEvent());
-
                     createDirectories.createSubFolder(viewListOfNotesActivity.selectedEvent(), "Notes");
                     File newFile = createDirectories.saveMaterial(viewListOfNotesActivity.selectedEvent(), "Notes", notesTitle.getText().toString(), notesBody.getText().toString());
                     MediaScannerConnection.scanFile(TakeNotesActivity.this, new String[]{newFile.toString()}, null, null);
-
                     Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
-                   // intent.putExtra("CalendarEvent", viewListOfNotesActivity.selectedEvent());
                     startActivity(intent);
                     Toast.makeText(getApplicationContext(), "Saved here..", Toast.LENGTH_LONG).show();
 
@@ -124,11 +113,10 @@ public class TakeNotesActivity extends AppCompatActivity {
 
                     Log.i("Selected Event", "is null");
                 }
-                //String fileFullPath = "/CourseCodify/"+
+
             }
               else{
                 currentEvent = getCalendarDetails.getCurrentEvent();
-//                Log.i("CurrentEvent", currentEvent);
                 if (currentEvent == null) {
 
                     AlertDialogs alertDialogs = new AlertDialogs(TakeNotesActivity.this);
@@ -136,20 +124,10 @@ public class TakeNotesActivity extends AppCompatActivity {
                     createdEvent= true;
 
                 } else {
-                    //Added on 20/12/2017 creating coursecodify if it doesnot exist
 
-                    //if(notesTitle)
-                    createDirectories.createCourseCodifyFile();
-
-                    createDirectories.createEventFolder(currentEvent);
-
-                    createDirectories.createSubFolder(currentEvent, "Notes");
-                    File newFile = createDirectories.saveMaterial(currentEvent, "Notes", notesTitle.getText().toString()+".txt", notesBody.getText().toString() );
-                    MediaScannerConnection.scanFile(TakeNotesActivity.this, new String[]{newFile.toString()}, null, null);
-
+                    save();
                     Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
                     intent.putExtra("CalendarEvent", currentEvent);
-                    Log.i("Selected ele", currentEvent);
                     startActivity(intent);
                     Toast.makeText(getApplicationContext(), "Saved here..", Toast.LENGTH_LONG).show();
 
@@ -161,7 +139,6 @@ public class TakeNotesActivity extends AppCompatActivity {
 
         if(id == R.id.goToViewNotes){
             Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
-            //intent.putExtra("CalendarEvent", viewListOfNotesActivity.selectedEvent());
             startActivity(intent);
 
         }
@@ -188,18 +165,20 @@ public class TakeNotesActivity extends AppCompatActivity {
             currentEvent = getCalendarDetails.getCurrentEvent();
             if (!notesTitle.equals("") || !notesBody.equals("")) {
                 if (currentEvent != null) {
-                    createDirectories.createCourseCodifyFile();
-                    createDirectories.createEventFolder(currentEvent);
-                    createDirectories.createSubFolder(currentEvent, "Notes");
-                    createDirectories.createNoMedia();
-                    File notesName = createDirectories.saveMaterial(currentEvent, "Notes", notesTitle.getText().toString() + ".txt", notesBody.getText().toString());
-                    MediaScannerConnection.scanFile(TakeNotesActivity.this, new String[]{notesName.toString()}, null, null);
-
+                    save();
 
                 }
             }
             createdEvent = false;
         }
+    }
+
+    public void save(){
+        createDirectories.createCourseCodifyFile();
+        createDirectories.createEventFolder(currentEvent);
+        createDirectories.createSubFolder(currentEvent, "Notes");
+        File notesName = createDirectories.saveMaterial(currentEvent, "Notes", notesTitle.getText().toString() + ".txt", notesBody.getText().toString());
+        MediaScannerConnection.scanFile(TakeNotesActivity.this, new String[]{notesName.toString()}, null, null);
     }
 
 

@@ -1,32 +1,24 @@
 package com.srishti.srish.coursecodify_v1;
 
-import android.Manifest;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class RecordingActivity extends AppCompatActivity {
 
@@ -52,7 +44,7 @@ public class RecordingActivity extends AppCompatActivity {
         microphoneRecordImage = (ImageView) findViewById(R.id.playOrpause);
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
         currentEvent = getCalendarDetails.getCurrentEvent();
@@ -83,7 +75,7 @@ public class RecordingActivity extends AppCompatActivity {
                             createDirectories.createEventFolder(currentEvent);
                             createDirectories.createSubFolder(currentEvent, "Recordings");
                             String outputFile= Environment
-                                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+ "/CourseCodify/" +currentEvent+"/Recordings/"+ "record"+ timeStamp+".3gp";
+                                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+ "/CourseCodify/" +currentEvent+"/Recordings/"+ "Rec_"+ timeStamp+".m4a";
 
                             mediaRecorder.setOutputFile(outputFile);
                             mediaRecorder.prepare();
@@ -167,4 +159,7 @@ public class RecordingActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+
 }

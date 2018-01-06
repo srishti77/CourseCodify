@@ -5,12 +5,19 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,8 +36,8 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
 
     CreateDirectories createDirectories = new CreateDirectories();
     static Spinner spinnerListOfEvents;
-    List notesList = new ArrayList<String>();
-    List recordingsList = new ArrayList<String>();
+    ArrayList notesList = new ArrayList<String>();
+    ArrayList recordingsList = new ArrayList<String>();
 
     ArrayAdapter notesArrayAdapter;
 
@@ -41,7 +48,11 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
     ArrayList<String> imageName = new ArrayList<>();
     Drawable drawableImage;
     ListSingleImageAdapter arrayAdapter;
+    TextView recordingsTitle, notesTitle, imagesTitle;
 
+    ViewListOfNotesActivity viewListOfNotesActivity = new ViewListOfNotesActivity();
+    ViewListOfPicturesActivity viewListOfPicturesActivity = new ViewListOfPicturesActivity();
+    ViewListOfRecordingsActivity viewListOfRecordingsActivity = new ViewListOfRecordingsActivity();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,24 +80,15 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
         listViewImages = (ListView) findViewById(R.id.listOfImages);
         listViewNotes = (ListView) findViewById(R.id.listOfNotes);
         listViewRecordings = (ListView) findViewById(R.id.listOfRecordings);
+        recordingsTitle = (TextView) findViewById(R.id.RecordingsTitle);
+        notesTitle = (TextView) findViewById(R.id.NotesTitle);
+        imagesTitle = (TextView) findViewById(R.id.ImagesTitle);
 
-        recordingsList.clear();
-        recordingsList.addAll(createDirectories
-                    .readAllDirectoryName(spinnerListOfEvents.getSelectedItem()+ "", "Recordings"));
-        Log.i("Recordings count",recordingsList.size()+"");
-        notesArrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, recordingsList);
-        listViewRecordings.setAdapter(notesArrayAdapter);
+        notesArrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, notesList);
+        listViewNotes.setAdapter(notesArrayAdapter);
 
-
-        notesList.clear();
-        notesList.addAll(createDirectories
-                .readAllDirectoryName(spinnerListOfEvents.getSelectedItem()+ "", "Notes"));
-        Log.i("Recordings count",notesList.size()+"");
-        recordingsArrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, notesList);
-        listViewNotes.setAdapter(recordingsArrayAdapter);
-
-
-
+        recordingsArrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, recordingsList);
+        listViewRecordings.setAdapter(recordingsArrayAdapter);
 
         arrayAdapter = new ListSingleImageAdapter(this, drawables, imageName);
         listViewImages.setAdapter(arrayAdapter);
@@ -99,8 +101,7 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
                 recordingsList.clear();
                 recordingsList.addAll(createDirectories
                         .readAllDirectoryName(spinnerListOfEvents.getSelectedItem()+ "", "Recordings"));
-
-                  recordingsArrayAdapter.notifyDataSetChanged();
+                recordingsArrayAdapter.notifyDataSetChanged();
 
                 notesList.clear();
                 notesList.addAll(createDirectories
@@ -108,7 +109,8 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
 
                 notesArrayAdapter.notifyDataSetChanged();
 
-
+                drawables.clear();
+                imageName.clear();
                 if(createDirectories.getCurrentFile("/CourseCodify/"+spinnerListOfEvents.getSelectedItem()+"/Images").listFiles() != null) {
 
                     for (File file : createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images").listFiles()) {
@@ -119,11 +121,12 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
                             drawables.add(drawableImage);
 
                             imageName.add(file.getName());
-                            arrayAdapter.notifyDataSetChanged();
 
                         }
                     }
+                    arrayAdapter.notifyDataSetChanged();
                 }
+                hide();
 
             }
 
@@ -131,43 +134,198 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
+
         });
 
 
         listViewNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("Position of ListItem", i+"");
-                Intent intent = new Intent(ViewAllMaterialActivity.this, TakeNotesActivity.class);
-                Log.i("File Name:", ViewListOfNotesActivity.notesTitles.get(i));
 
-                String notesContent = createDirectories.readContentOfNotesFile(spinnerListOfEvents.getSelectedItem()+"/Notes/"+ViewListOfNotesActivity.notesTitles.get(i)).toString();
-                intent.putExtra("NoteId", i);
+                Intent intent = new Intent(ViewAllMaterialActivity.this, TakeNotesActivity.class);
+                String notesContent = createDirectories.readContentOfNotesFile(spinnerListOfEvents.getSelectedItem()+"/Notes/"+ notesList.get(i)).toString();
+                intent.putExtra("NoteName", notesList.get(i)+"");
                 intent.putExtra("NotesContent", notesContent);
                 startActivity(intent);
             }
         });
 
+        listViewNotes.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                final PopupMenu popupMenu = popupMenu(listViewNotes);
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int id = item.getItemId();
+                        if(id == R.id.delete){
+                            viewListOfNotesActivity.deleteNotes( position, spinnerListOfEvents.getSelectedItem()+"", notesList);
+
+                            arrayAdapter.notifyDataSetChanged();
+                        }
+
+                        if(id == R.id.share){
+                            item = popupMenu.getMenu().findItem(id);
+                            //viewListOfNotesActivity.shareNotes(spinnerListOfEvents.getSelectedItem().toString(),notesList.get(position).toString(),ViewAllMaterialActivity.this );
+                            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/CourseCodify/"+spinnerListOfEvents.getSelectedItem()
+                                    +"/Notes/"+notesList.get(position));
+                            Intent myShareIntent = new Intent();
+                            myShareIntent.setAction(Intent.ACTION_SEND);
+
+
+                            Uri fileURI = FileProvider.getUriForFile(ViewAllMaterialActivity.this ,"com.srishti.srish.coursecodify_v1", file);
+                            Log.i("The path..", fileURI+"");
+                            myShareIntent.putExtra(Intent.EXTRA_STREAM, fileURI );
+                            myShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            myShareIntent.setType("text/*");
+                            startActivity(Intent.createChooser(myShareIntent, "Share"));
+                        }
+                        return true;
+                    }
+                });
+
+                popupMenu.show();
+                return true;
+            }
+        });
+
+
+
+
         listViewRecordings.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, final int position, long l) {
 
-                Intent intent = new Intent(ViewAllMaterialActivity.this, RecordingActivity.class);
+               // viewListOfRecordingsActivity.letsPlay(view, i, recordingsList.get(i)+"");
+                Intent intent = new Intent(ViewAllMaterialActivity.this, RecordingsPlay.class);
+                intent.putExtra("SelectedEvent", spinnerListOfEvents.getSelectedItem()+"");
+                intent.putExtra("recording", recordingsList.get(position)+"");
+
                 startActivity(intent);
             }
 
         });
+
+
+        listViewRecordings.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l) {
+
+                final PopupMenu popupMenu = popupMenu(listViewNotes);
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int id = item.getItemId();
+                        if (id == R.id.delete) {
+                            viewListOfRecordingsActivity.deleteRecordings(position, spinnerListOfEvents.getSelectedItem() + "", recordingsList);
+
+                            arrayAdapter.notifyDataSetChanged();
+                        }
+
+                        if (id == R.id.share) {
+                            item = popupMenu.getMenu().findItem(id);
+                          File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + spinnerListOfEvents.getSelectedItem()
+                                    + "/Recordings/" + recordingsList.get(position));
+                            Intent myShareIntent = new Intent();
+                            myShareIntent.setAction(Intent.ACTION_SEND);
+
+
+                            Uri fileURI = FileProvider.getUriForFile(ViewAllMaterialActivity.this, "com.srishti.srish.coursecodify_v1", file);
+                            Log.i("The path..", fileURI + "");
+                            myShareIntent.putExtra(Intent.EXTRA_STREAM, fileURI);
+                            myShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            myShareIntent.setType("audio/*");
+                            startActivity(Intent.createChooser(myShareIntent, "Share"));
+                        }
+                        return true;
+                    }
+                });
+
+                popupMenu.show();
+                return true;
+            }
+        });
+
 
         listViewImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Intent intent = new Intent(ViewAllMaterialActivity.this, ViewListOfPicturesActivity.class);
+                byte[] byteArray = getImageToSend(position, drawables);
+                Intent intent = new Intent(ViewAllMaterialActivity.this, ViewImageFullScreenActivity.class);
+                intent.putExtra("ImageView",byteArray);
                 startActivity(intent);
             }
-
         });
 
+        listViewImages.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                final PopupMenu popupMenu = popupMenu(listViewImages);
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int id = item.getItemId();
+                        if (id == R.id.delete) {
+
+                            viewListOfPicturesActivity.deleteImages(position,spinnerListOfEvents.getSelectedItem().toString(),drawables,imageName);
+                            arrayAdapter.notifyDataSetChanged();
+                        }
+
+                        if (id == R.id.share) {
+                            item = popupMenu.getMenu().findItem(id);
+                            viewListOfPicturesActivity.shareImages(item, ViewAllMaterialActivity.this.getContentResolver(),drawables.get(position));
+                        }
+                        return true;
+                    }
+                });
+
+                popupMenu.show();
+                return true;
+            }
+        });
+
+    }
+
+    public void hide(){
+        if(recordingsList.size() != 0)
+            recordingsTitle.setText("Recordings");
+        else
+            recordingsTitle.setText("");
+
+        if(notesList.size() != 0)
+            notesTitle.setText("Notes");
+        else
+            notesTitle.setText("");
+
+        if(drawables.size() != 0)
+            imagesTitle.setText("Images");
+        else
+            imagesTitle.setText("");
+    }
+
+    public static byte[] getImageToSend( int position,  ArrayList<Drawable> drawables1  ){
+        Bitmap bitmap = ((BitmapDrawable) drawables1.get(position)).getBitmap();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return byteArray;
+    }
+
+    public PopupMenu  popupMenu(ListView listView){
+
+        final PopupMenu popupMenu = new PopupMenu(ViewAllMaterialActivity.this, listView, Gravity.NO_GRAVITY, R.attr.actionDropDownStyle, 0);
+
+        popupMenu.getMenuInflater().inflate(R.menu.menu_shareordelete, popupMenu.getMenu());
+
+        return popupMenu;
     }
 
 }

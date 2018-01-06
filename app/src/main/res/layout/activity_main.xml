@@ -23,8 +23,8 @@
         android:layout_height="wrap_content"
         android:text="@string/todays_event"
         android:paddingLeft="10dp"
-        android:textSize="40dp"
-        android:textColor="@color/blue"
+        android:textSize="20dp"
+        android:textColor="@color/colorAccent"
         android:background="#F0F8FF"
         android:textColorHighlight="@color/colorPrimary"
         android:id="@+id/todayEvent"/>

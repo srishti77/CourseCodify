@@ -1,5 +1,6 @@
 package com.srishti.srish.coursecodify_v1;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -33,12 +34,13 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
 
     ListSingleImageAdapter arrayAdapter;
     ArrayList<Drawable> drawables = new ArrayList<Drawable>();
-    ArrayList<String> nameOfFiles =  new ArrayList<String>();
+    ArrayList<String> nameOfFiles = new ArrayList<String>();
 
     Drawable drawableImage;
     CreateDirectories createDirectories = new CreateDirectories();
     Spinner spinnerListOfEvents;
-    String selectedEvent = null;
+    final ArrayList<String> imageName = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,22 +48,19 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
 
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         spinnerListOfEvents = (Spinner) findViewById(R.id.images_listOfEvents);
-
         List listOfevents = new ArrayList<>();
 
-
         listOfevents.addAll(createDirectories.readAllDirectoryName(null, null));
-        Log.i("Count of Events", listOfevents.size()+ "");
-        ArrayAdapter<String> arrayAdapterListOfEvents = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,listOfevents );
+        Log.i("Count of Events", listOfevents.size() + "");
+        ArrayAdapter<String> arrayAdapterListOfEvents = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listOfevents);
         arrayAdapterListOfEvents.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerListOfEvents.setAdapter(arrayAdapterListOfEvents);
 
-        final ArrayList<String> imageName = new ArrayList<>();
 
         Intent intent = getIntent();
         String event = intent.getStringExtra("CurrentCalendarEvent");
 
-        if(event != null){
+        if (event != null) {
 
             spinnerListOfEvents.setSelection(arrayAdapterListOfEvents.getPosition(event));
         }
@@ -73,25 +72,28 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
                 drawables.clear();
                 nameOfFiles.clear();
                 imageName.clear();
+                arrayAdapter.clear();
                 Log.i("Spinner", "spinner is changed");
 
-                if(createDirectories.getCurrentFile("/CourseCodify/"+spinnerListOfEvents.getSelectedItem()+"/Images").listFiles() != null) {
+                if (createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images").listFiles() != null) {
 
                     for (File file : createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images").listFiles()) {
                         if (file.isFile()) {
 
                             drawableImage = Drawable.createFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images/" + file.getName());
 
-
                             drawables.add(drawableImage);
 
                             nameOfFiles.add(file.getName());
                             imageName.add(file.getName());
-                            arrayAdapter.notifyDataSetChanged();
+
 
                         }
                     }
+
+
                 }
+                arrayAdapter.notifyDataSetChanged();
 
             }
 
@@ -100,10 +102,10 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
-        } );
+        });
 
 
-        final ListView listView = (ListView)  findViewById(R.id.listOfImage);
+        final ListView listView = (ListView) findViewById(R.id.listOfImage);
         arrayAdapter = new ListSingleImageAdapter(this, drawables, imageName);
         listView.setAdapter(arrayAdapter);
 
@@ -111,14 +113,10 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-
-                Bitmap bitmap = ((BitmapDrawable) drawables.get(position)).getBitmap();
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-                byte[] buteArray = byteArrayOutputStream.toByteArray();
+                byte[] byteArray = ViewAllMaterialActivity.getImageToSend(position, drawables);
 
                 Intent intent = new Intent(ViewListOfPicturesActivity.this, ViewImageFullScreenActivity.class);
-                intent.putExtra("ImageView",buteArray);
+                intent.putExtra("ImageView", byteArray);
 
                 startActivity(intent);
             }
@@ -138,37 +136,15 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
-                        if(id == R.id.delete){
-                            Log.i("Delete Position", position+"");
-                            Log.i("CountImageName Array",imageName.size()+"" );
+                        if (id == R.id.delete) {
 
-                            File directory = createDirectories.getCurrentFile("CourseCodify/"+spinnerListOfEvents.getSelectedItem()+"/Images");
-                            for(File file : directory.listFiles()){
-                                if(imageName.get(position).compareTo(file.getName()) == 0){
-                                    file.delete();
-                                }
-                            }
-                            drawables.remove(position);
-                            imageName.remove(position);
+                            deleteImages(position,spinnerListOfEvents.getSelectedItem().toString(),drawables,imageName);
                             arrayAdapter.notifyDataSetChanged();
                         }
 
-                        if(id == R.id.share){
+                        if (id == R.id.share) {
                             item = popupMenu.getMenu().findItem(id);
-                            Log.i("Popup item", item+"");
-                            ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
-                            Log.i("Check Shareaction ", shareActionProvider+"");
-                            Bitmap bitmap = ((BitmapDrawable) drawables.get(position)).getBitmap();
-                            String path = MediaStore.Images.Media.insertImage(ViewListOfPicturesActivity.this.getContentResolver(),
-                                    bitmap, "Design", null);
-                            Uri uri = Uri.parse(path);
-
-                            Intent shareIntent = new Intent();
-                            shareIntent.setAction(Intent.ACTION_SEND);
-                            shareIntent.setType("image/*");
-                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-
-                            shareActionProvider.setShareIntent(shareIntent);
+                            shareImages(item, ViewListOfPicturesActivity.this.getContentResolver(), drawables.get(position));
                         }
                         return true;
                     }
@@ -183,10 +159,9 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.home){
+        if (item.getItemId() == R.id.home) {
             this.finish();
             return true;
 
@@ -195,7 +170,44 @@ public class ViewListOfPicturesActivity extends AppCompatActivity {
     }
 
 
+    public void deleteImages(int position, String event, ArrayList<Drawable> drawablesDelete, ArrayList<String> imageNameDelete){
 
+        try{
+            File directory = createDirectories.getCurrentFile("CourseCodify/" + event + "/Images");
+            for (File file : directory.listFiles()) {
+                if (imageNameDelete.get(position).compareTo(file.getName()) == 0) {
+                    file.delete();
+                }
+            }
+            drawablesDelete.remove(position);
+            imageNameDelete.remove(position);
+        }
+
+
+        catch(Exception e){
+           // Toast.makeText(getApplicationContext(), "File Could not be deleted", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+
+    }
+
+    public void shareImages(MenuItem item, ContentResolver contentResolver, Drawable drawable){
+
+
+        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        String path = MediaStore.Images.Media.insertImage(contentResolver,
+                bitmap, "Design", null);
+        Uri uri = Uri.parse(path);
+
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setType("image/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+
+        shareActionProvider.setShareIntent(shareIntent);
+    }
 
 
 
