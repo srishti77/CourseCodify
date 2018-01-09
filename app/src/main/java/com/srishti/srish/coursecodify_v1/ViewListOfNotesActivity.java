@@ -123,7 +123,7 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
 
                         if(id == R.id.share){
                             item = popupMenu.getMenu().findItem(id);
-                            shareNotes(selectedEvent(), notesTitles.get(position), ViewListOfNotesActivity.this);
+                            shareNotes(selectedEvent(), notesTitles.get(position), ViewListOfNotesActivity.this, item);
 
                         }
                         return true;
@@ -156,7 +156,9 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
 
     }
 
-    public void shareNotes( String event, String notesName, Context context){
+    public void shareNotes( String event, String notesName, Context context, MenuItem item){
+
+        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
 
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/CourseCodify/"+event+"/Notes/"+notesName);
         Intent myShareIntent = new Intent();
@@ -168,7 +170,9 @@ public class ViewListOfNotesActivity extends AppCompatActivity {
         myShareIntent.putExtra(Intent.EXTRA_STREAM, fileURI );
         myShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         myShareIntent.setType("text/*");
-        startActivity(Intent.createChooser(myShareIntent, "Share"));
+       // startActivity(Intent.createChooser(myShareIntent, "Share"));
+
+        shareActionProvider.setShareIntent(myShareIntent);
 
     }
 

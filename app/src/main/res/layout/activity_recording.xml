@@ -15,6 +15,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100dp"
         android:hint="@string/timer_hint"
+        android:textColorHint="@color/colorAccent"
         android:textSize="60sp" />
 
     <ImageView

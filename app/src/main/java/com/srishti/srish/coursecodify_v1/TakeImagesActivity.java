@@ -123,7 +123,7 @@ public class TakeImagesActivity extends AppCompatActivity {
                 Log.i("JpegSizes",jpegSizes+"");
             }
 
-            //image size is too big
+
             int width=640,height=480;
             if(jpegSizes!=null && jpegSizes.length>0)
             {
@@ -370,24 +370,28 @@ public class TakeImagesActivity extends AppCompatActivity {
 
     private  File getOutputMediaFile() {
         File mediaStorageDir = null;
-        if(getCalendarDetails.getCurrentEvent() == null){
+        String currentEvent = getCalendarDetails.getCurrentEvent();
+        if(currentEvent  == null){
 
            return mediaStorageDir;
         }
         else {
 
-            createDirectories.createCourseCodifyFile();
+            String directory =  Environment
+                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+
+                    createDirectories.createCourseCodifyFile() + "/" + getCalendarDetails.getCurrentEvent();
 
-             mediaStorageDir = new File(
-                    Environment
-                            .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-                     createDirectories.createCourseCodifyFile() + "/" + getCalendarDetails.getCurrentEvent()+"/Images");
+            createDirectories.createCourseCodifyFile();
+            createDirectories.createEventFolder(currentEvent);
+            createDirectories.createNoMedia( directory);
+
+            mediaStorageDir = new File(directory+"/Images");
 
             if (!mediaStorageDir.exists()) {
                 mediaStorageDir.mkdirs();
-                createDirectories.createNoMedia(mediaStorageDir.getPath());
 
             }
+
             return mediaStorageDir;
         }
     }

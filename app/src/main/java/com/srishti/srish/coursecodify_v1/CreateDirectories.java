@@ -25,21 +25,10 @@ public class CreateDirectories {
             Log.i("Nomedia","created");
             File mediaStorageDir = new File(directory );
             File nomediaFile = new File(mediaStorageDir.getPath()+"/.nomedia");
+            Log.i("Path",nomediaFile.getPath());
+            if(!nomediaFile.exists())
             nomediaFile.createNewFile();
 
-           /* if (!mediaStorageDir.exists()) {
-                mediaStorageDir.mkdirs();
-            }
-                if (!mediaStorageDir.mkdirs()) {
-                    Log.d("MyCameraApp .nomedia", "failed to create directory");
-                    return;
-
-                }
-
-                else{
-                File nomediaFile = new File(mediaStorageDir.getPath()+"/.nomedia");
-                nomediaFile.createNewFile();
-                }*/
         }
         catch (Exception e){
             e.printStackTrace();
@@ -71,10 +60,7 @@ public class CreateDirectories {
         if(!mediaStorageDir.exists()){
 
             mediaStorageDir.mkdirs();
-            Log.i("Event","Created");
-            if(!mediaStorageDir.mkdirs()){
-                Log.i("mainFile is created--","CourseCodify");
-            }
+
         }
         Log.i("Event","-----");
         return mediaStorageDir.getName();

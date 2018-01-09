@@ -13,7 +13,7 @@
     </item>
     <item android:id="@+id/saveNotes"
         android:title=""
-        android:icon="@mipmap/tickblue"
+        android:icon="@mipmap/tick"
         app:showAsAction="always">
 
     </item>

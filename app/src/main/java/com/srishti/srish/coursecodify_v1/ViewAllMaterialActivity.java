@@ -161,8 +161,9 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
+                        String event = spinnerListOfEvents.getSelectedItem()+"";
                         if(id == R.id.delete){
-                            viewListOfNotesActivity.deleteNotes( position, spinnerListOfEvents.getSelectedItem()+"", notesList);
+                            viewListOfNotesActivity.deleteNotes( position, event, notesList);
 
                             arrayAdapter.notifyDataSetChanged();
                         }
@@ -170,7 +171,7 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
                         if(id == R.id.share){
                             item = popupMenu.getMenu().findItem(id);
                             //viewListOfNotesActivity.shareNotes(spinnerListOfEvents.getSelectedItem().toString(),notesList.get(position).toString(),ViewAllMaterialActivity.this );
-                            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/CourseCodify/"+spinnerListOfEvents.getSelectedItem()
+                           /* File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/CourseCodify/"+spinnerListOfEvents.getSelectedItem()
                                     +"/Notes/"+notesList.get(position));
                             Intent myShareIntent = new Intent();
                             myShareIntent.setAction(Intent.ACTION_SEND);
@@ -182,6 +183,9 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
                             myShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             myShareIntent.setType("text/*");
                             startActivity(Intent.createChooser(myShareIntent, "Share"));
+                            */
+
+                           viewListOfNotesActivity.shareNotes(event, notesList.get(position)+"", ViewAllMaterialActivity.this, item);
                         }
                         return true;
                     }
