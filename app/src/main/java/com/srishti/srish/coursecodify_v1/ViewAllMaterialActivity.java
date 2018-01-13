@@ -232,7 +232,8 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
 
                         if (id == R.id.share) {
                             item = popupMenu.getMenu().findItem(id);
-                          File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + spinnerListOfEvents.getSelectedItem()
+                            //viewListOfRecordingsActivity.shareRecordings(spinnerListOfEvents.getSelectedItem().toString(), recordingsList.get(position).toString(), ViewAllMaterialActivity.this);
+                          /*File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + spinnerListOfEvents.getSelectedItem()
                                     + "/Recordings/" + recordingsList.get(position));
                             Intent myShareIntent = new Intent();
                             myShareIntent.setAction(Intent.ACTION_SEND);
@@ -243,7 +244,7 @@ public class ViewAllMaterialActivity extends AppCompatActivity {
                             myShareIntent.putExtra(Intent.EXTRA_STREAM, fileURI);
                             myShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             myShareIntent.setType("audio/*");
-                            startActivity(Intent.createChooser(myShareIntent, "Share"));
+                            startActivity(Intent.createChooser(myShareIntent, "Share"));*/
                         }
                         return true;
                     }

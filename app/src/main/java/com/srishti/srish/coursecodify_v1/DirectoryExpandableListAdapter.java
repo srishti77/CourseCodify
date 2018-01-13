@@ -105,20 +105,25 @@ import java.util.ArrayList;
 
         TextView childCount = (TextView) view.findViewById(R.id.countChildItem);
         Log.i( "Event Name --:"+ eventName.getText(), childName.getText()+"");
-        childCount.setText("   ["+createDirectories.readAllDirectoryName(eventName.getText().toString(),childName.getText().toString()).size()+"]");
+        int numberOfMaterial = createDirectories.readAllDirectoryName(eventName.getText().toString(),childName.getText().toString()).size();
+
+        if(numberOfMaterial > 0)
+        childCount.setText("   ["+numberOfMaterial+"]");
 
         childName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(childName.getText().toString().equals("Images")){
-                    Intent intent = new Intent(view.getContext() , ViewListOfPicturesActivity.class);
+                    Intent intent = new Intent(view.getContext() , AllListActivity.class);
                     intent.putExtra("CurrentCalendarEvent",groupName.get(i) );
+                    intent.putExtra("Material","Images");
                     context.startActivity(intent);
                 }
                 else if(childName.getText().toString().equals("Notes")){
 
-                    Intent intent = new Intent(view.getContext() , ViewListOfNotesActivity.class);
+                    Intent intent = new Intent(view.getContext() , AllListActivity.class);
                     intent.putExtra("CalendarEvent",groupName.get(i) );
+                    intent.putExtra("Material","Notes");
                     context.startActivity(intent);
 
                 }
@@ -127,15 +132,16 @@ import java.util.ArrayList;
 
                     Intent intent = new Intent(view.getContext() , ViewListOfRecordingsActivity.class);
                     intent.putExtra("CalendarEvent",groupName.get(i) );
+                    intent.putExtra("Material","Recordings");
                     context.startActivity(intent);
 
                 }
 
                 else if(childName.getText().toString().equals("All Materials")){
 
-                    Intent intent = new Intent(view.getContext() , ViewAllMaterialActivity.class);
+                    Intent intent = new Intent(view.getContext() , AllListActivity.class);
                     intent.putExtra("CalendarEvent",groupName.get(i) );
-                    intent.putExtra("MaterialType", "All Materials");
+                    intent.putExtra("Material", "All Materials");
                     context.startActivity(intent);
 
                 }

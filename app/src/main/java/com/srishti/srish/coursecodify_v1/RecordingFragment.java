@@ -4,73 +4,76 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewListOfRecordingsActivity extends AppCompatActivity {
 
+public class RecordingFragment extends SharingImplementation {
+
+    View view;
     CreateDirectories createDirectories = new CreateDirectories();
-    static Spinner spinnerListOfEvents;
+   // static Spinner spinnerListOfEvents;
     static ArrayList<String> recordings = new ArrayList<String>();
     static ArrayAdapter arrayAdapter;
     static boolean onPlayStart = true;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_list_of_recordings);
+    String event;
+    String folder;
+    public RecordingFragment() {
+        // Required empty public constructor
+    }
 
-        spinnerListOfEvents = (Spinner) findViewById(R.id.recording_listOfEvents);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Intent intent = getActivity().getIntent();
+        event = intent.getStringExtra("CalendarEvent");
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        Log.i("View Recording", "Fragment");
+        view = inflater.inflate(R.layout.fragment_recording, container, false);
+        Bundle bundle = getArguments();
+
+        folder = bundle.getString("Folder");
         List listOfevents = new ArrayList<>();
 
-        Intent intent = getIntent();
-        String event = intent.getStringExtra("CalendarEvent");
+
 
         listOfevents.clear();
         listOfevents.addAll(createDirectories.readAllDirectoryName(null, null));
 
-        Log.i("Count of Events--", listOfevents.size()+"");
-        ArrayAdapter<String> arrayAdapterListOfEvents = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,listOfevents );
-        arrayAdapterListOfEvents.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerListOfEvents.setAdapter(arrayAdapterListOfEvents);
 
-
-        if(event != null){
-            Log.i("ViewListOfNotesActivity", event);
-            Log.i("Position of newyear", listOfevents.indexOf(event)+"");
-            spinnerListOfEvents.setSelection(arrayAdapterListOfEvents.getPosition(event));
-        }
-
-        final ListView listView = (ListView) findViewById(R.id.listOfRecordings);
+        final ListView listView = (ListView) view.findViewById(R.id.listOfRecordings);
         recordings.clear();;
-        //recordings.addAll(createDirectories.readAllDirectoryName(spinnerListOfEvents.getSelectedItem()+ "", "Recordings"));
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, recordings);
+        recordings.addAll(createDirectories.readAllDirectoryName(folder+ "", "Recordings"));
+        arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, recordings);
         listView.setAdapter(arrayAdapter);
 
-        spinnerListOfEvents.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        /*spinnerListOfEvents.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
@@ -88,24 +91,24 @@ public class ViewListOfRecordingsActivity extends AppCompatActivity {
             }
         });
 
+*/
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
 
 
-     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-         @Override
-         public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                letsPlay(view, i, recordings.get(i));
 
+            }
 
-             letsPlay(view, i, recordings.get(i));
-
-         }
-
-     });
+        });
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l) {
 
-                final PopupMenu popupMenu = new PopupMenu(ViewListOfRecordingsActivity.this, listView, Gravity.NO_GRAVITY, R.attr.actionDropDownStyle, 0);
+                final PopupMenu popupMenu = new PopupMenu(getActivity(), listView, Gravity.NO_GRAVITY, R.attr.actionDropDownStyle, 0);
 
                 popupMenu.getMenuInflater().inflate(R.menu.menu_shareordelete, popupMenu.getMenu());
 
@@ -114,14 +117,14 @@ public class ViewListOfRecordingsActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
                         if(id == R.id.delete){
-                            deleteRecordings( position, spinnerListOfEvents.getSelectedItem().toString(), recordings );
+                            deleteRecordings( position, folder, recordings );
 
                             arrayAdapter.notifyDataSetChanged();
                         }
 
                         if(id == R.id.share){
                             item = popupMenu.getMenu().findItem(id);
-                            //shareRecordings(spinnerListOfEvents.getSelectedItem().toString(), recordings.get(position), ViewListOfRecordingsActivity.this);
+                            shareRecordings(folder, recordings.get(position), getActivity());
 
                         }
                         return true;
@@ -134,14 +137,15 @@ public class ViewListOfRecordingsActivity extends AppCompatActivity {
             }
         });
 
-    }
+        return view;
 
+    }
 
     public void letsPlay(View view, int i, String recording ){
 
 
         view = getLayoutInflater().inflate(R.layout.bottom_sheet_recordings_play_layout, null);
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ViewListOfRecordingsActivity.this);
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity());
         bottomSheetDialog.setContentView(view);
 
         TextView recordingName = (TextView) view.findViewById(R.id.Name_Of_Recordings);
@@ -156,7 +160,7 @@ public class ViewListOfRecordingsActivity extends AppCompatActivity {
 
             String outputFile = Environment
                     .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-                    + "/CourseCodify/" + spinnerListOfEvents.getSelectedItem()
+                    + "/CourseCodify/" + folder
                     + "/Recordings/" + recording;
 
             mediaPlayer.setDataSource(outputFile);
@@ -219,6 +223,12 @@ public class ViewListOfRecordingsActivity extends AppCompatActivity {
 
     }
 
+    public void onSpinnerChange(String event){
+        recordings.clear();
 
+        recordings.addAll(createDirectories.readAllDirectoryName(event, "Recordings"));
+
+        arrayAdapter.notifyDataSetChanged();
+    }
 
 }

@@ -467,7 +467,7 @@ public class TakeImagesActivity extends AppCompatActivity {
     public void askConfirmationToSave( File file){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(TakeImagesActivity.this);
-        builder.setMessage("Your image will be saved in" + file.getName())
+        builder.setMessage("Your image will be saved in" + file.getAbsolutePath())
                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
 
                     @Override
