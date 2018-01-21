@@ -39,7 +39,9 @@ import android.view.MenuItem;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import java.io.File;
@@ -54,7 +56,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import android.text.format.Time;
-public class TakeImagesActivity extends AppCompatActivity {
+public class TakeImagesActivity extends CourseCodifyHelper {
 
     private android.util.Size previewsize;
     private android.util.Size[] jpegSizes=null;
@@ -64,7 +66,7 @@ public class TakeImagesActivity extends AppCompatActivity {
     private CaptureRequest.Builder previewBuilder;
     private CameraCaptureSession previewSession;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
-    CreateDirectories createDirectories = new CreateDirectories();
+
     private static final SparseIntArray ORIENTATIONS=new SparseIntArray();
     static
     {
@@ -77,8 +79,9 @@ public class TakeImagesActivity extends AppCompatActivity {
     TextureView imageTextureView;
     GetCalendarDetails getCalendarDetails = new GetCalendarDetails(TakeImagesActivity.this);
 
-    //save byte image so that we can save the image when the event is created
      byte[] saveImageByte = null;
+     ArrayList<String> currentEvent;
+    // static String selectedCurrentEvent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,10 +93,10 @@ public class TakeImagesActivity extends AppCompatActivity {
 
         ImageButton buttonTakePicture = (ImageButton) findViewById(R.id.buttonTakePicture);
 
-
         imageTextureView.setSurfaceTextureListener(surfaceTextureListener);
 
-        // to click the picture
+
+
         buttonTakePicture.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
@@ -173,15 +176,18 @@ public class TakeImagesActivity extends AppCompatActivity {
                     If  there is no current event we direct them to the google calendar
                      */
                     setByteOfImage(bytes);
-
                     if(file12 == null) {
-                        //                        //saveImageByte = bytes;
+                        Log.i("No Event", "called");
                         goTOCalendar();
                         Toast.makeText(getApplicationContext(), "You have to create an event to save the file", Toast.LENGTH_LONG).show();
 
                     }
                     else {
-                       askConfirmationToSave(file12);
+
+                        /*
+                        When event exists then we save it
+                         */
+                        writeIntoLocation();
                     }
                 }
 
@@ -370,43 +376,24 @@ public class TakeImagesActivity extends AppCompatActivity {
 
     private  File getOutputMediaFile() {
         File mediaStorageDir = null;
-        String currentEvent = getCalendarDetails.getCurrentEvent();
-        if(currentEvent  == null){
+
+        currentEvent.clear();
+
+        currentEvent = getCalendarDetails.getCurrentEvent();
+        Log.i("Count CurrentEvent", currentEvent.size()+"");
+
+        if(currentEvent.isEmpty()){
 
            return mediaStorageDir;
         }
         else {
 
-            String directory =  Environment
-                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+
-                    createDirectories.createCourseCodifyFile() + "/" + getCalendarDetails.getCurrentEvent();
-
-            createDirectories.createCourseCodifyFile();
-            createDirectories.createEventFolder(currentEvent);
-            createDirectories.createNoMedia( directory);
-
-            mediaStorageDir = new File(directory+"/Images");
-
-            if (!mediaStorageDir.exists()) {
-                mediaStorageDir.mkdirs();
-
-            }
-
-            return mediaStorageDir;
+                Log.i("GetOutput","Media Called");
+                mediaStorageDir = saveImagesIntoFolder(selectedCurrentEvent);
+                return mediaStorageDir;
         }
     }
 
-    public File getImageName(){
-        File mediaStorageDir = getOutputMediaFile();
-         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
-                .format(new Date());
-
-       File mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                + "IMG_" + timeStamp + ".jpg");
-        MediaScannerConnection.scanFile(TakeImagesActivity.this, new String[]{mediaFile.toString()}, null, null);
-
-        return mediaFile;
-    }
 
     public void goTOCalendar(){
 
@@ -422,7 +409,7 @@ public class TakeImagesActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                // close the app
+
                 Toast.makeText(TakeImagesActivity.this, "Sorry!!!, you can't use this app without granting permission", Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -447,8 +434,9 @@ public class TakeImagesActivity extends AppCompatActivity {
             return true;
         }
         if(id == R.id.viewlistOfPicture){
-            Intent intent = new Intent(TakeImagesActivity.this,  ViewListOfPicturesActivity.class);
-            intent.putExtra("CurrentCalendarEvent", getCalendarDetails.getCurrentEvent());
+            Intent intent = new Intent(TakeImagesActivity.this,  AllListActivity.class);
+            intent.putExtra("Material", "Images");
+            intent.putExtra("CalendarEvent", selectedCurrentEvent);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
@@ -463,70 +451,109 @@ public class TakeImagesActivity extends AppCompatActivity {
         return saveImageByte;
     }
 
-
-    public void askConfirmationToSave( File file){
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(TakeImagesActivity.this);
-        builder.setMessage("Your image will be saved in" + file.getAbsolutePath())
-                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.i("OnClick","Save is pressed");
-                        //Log.i("OnClick",getByteOfImage().length+"");
-                        OutputStream outputStream = null;
-                        try {
-                            outputStream = new FileOutputStream(getImageName());
-                            outputStream.write(getByteOfImage());
-
-                        } catch (Exception e) {
-                            Log.i("Could not", "save");
-                            e.printStackTrace();
-                        } finally {
-                            try {
-                                if (outputStream != null)
-                                    outputStream.close();
-                            } catch (Exception e) {
-                               Log.i("Could not close","outputstream");
-                               e.printStackTrace();
-                            }
-                        }
-
-                        Toast.makeText(getApplicationContext(), "Save Pressed", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Create Event", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        goTOCalendar();
-                        Toast.makeText(getApplicationContext(), "Create Event Pressed", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i("On Resume", "called");
 
         File file;
-        if(getByteOfImage() != null) {
-            Log.i("getByteImage", "is not null");
-            file = getOutputMediaFile();
-            Log.i("FileName is", file.getParent());
-            askConfirmationToSave(file);
 
+        currentEvent = new ArrayList<String>();
+
+        if(selectedCurrentEvent == null){
+
+            Log.i("Selected Event", "is null");
+            currentEvent.clear();
+            currentEvent = getCalendarDetails.getCurrentEvent();
+                if(currentEvent.size() == 1){
+                    Log.i("Only one event","");
+                    selectedCurrentEvent = currentEvent.get(0);
+
+                    if(getByteOfImage() != null) {
+                        Log.i("On Resume", "called");
+                        file = getOutputMediaFile();
+
+                        writeIntoLocation();
+                    }
+                }
+
+                else if(currentEvent.size()>1){
+                    selectedCurrentEvent = showAlertToChooseEvent(currentEvent);
+                }
         }
-
-       // getPicture();
     }
 
 
+    String showAlertToChooseEvent(final ArrayList<String> currentEvent){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(TakeImagesActivity.this);
+        builder.setTitle("Choose the event To Save Images");
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_list_item_1,
+                currentEvent );
+
+
+        builder.setSingleChoiceItems(arrayAdapter, -1,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        selectedCurrentEvent = currentEvent.get(i);
+
+                        Log.i("showAlertToChooseEvent","called");
+                        Toast.makeText(getApplicationContext(), "Selected Event "+ selectedCurrentEvent,Toast.LENGTH_LONG).show();
+
+
+                    }
+                });
+        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                File file;
+                if(getByteOfImage() != null) {
+                    Log.i("On Resume", "called");
+                    file = getOutputMediaFile();
+
+                    writeIntoLocation();
+                }
+            }
+        });
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        return selectedCurrentEvent;
+    }
+
+    public void writeIntoLocation(){
+        File mediaStorageDir = getOutputMediaFile();
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
+                .format(new Date());
+
+        File mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                + "IMG_" + timeStamp + ".jpg");
+        MediaScannerConnection.scanFile(TakeImagesActivity.this, new String[]{mediaFile.toString()}, null, null);
+
+        OutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(mediaFile);
+            outputStream.write(getByteOfImage());
+
+        } catch (Exception e) {
+            Log.i("Could not", "save");
+            e.printStackTrace();
+        } finally {
+            try {
+                if (outputStream != null)
+                    outputStream.close();
+            } catch (Exception e) {
+                Log.i("Could not close","outputstream");
+                e.printStackTrace();
+            }
+        }
+
+        Toast.makeText(getApplicationContext(), "Save Pressed", Toast.LENGTH_SHORT).show();
+
+    }
 
 }
 

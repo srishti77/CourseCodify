@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -24,7 +25,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-public class TakeNotesActivity extends AppCompatActivity {
+public class TakeNotesActivity extends CourseCodifyHelper {
 
     EditText notesTitle;
     EditText notesBody;
@@ -35,10 +36,12 @@ public class TakeNotesActivity extends AppCompatActivity {
     CreateDirectories createDirectories = new CreateDirectories();
     String noteName;
     String notesContent;
-    String currentEvent;
+    String currentSelected, selectedCurrentEvent;
+
+    ArrayList<String> currentEvent = new ArrayList<String>();
     boolean createdEvent = false;
     private static final int REQUEST_FileAccess_PERMISSION = 300;
-    ViewListOfNotesActivity viewListOfNotesActivity = new ViewListOfNotesActivity();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,9 +50,12 @@ public class TakeNotesActivity extends AppCompatActivity {
 
         notesTitle = (EditText) findViewById(R.id.titleNotes);
         notesBody = (EditText) findViewById(R.id.notesBody);
+
         Intent intent = getIntent();
         noteName = intent.getStringExtra("NoteName");
         notesContent = intent.getStringExtra("NotesContent");
+        currentSelected = intent.getStringExtra("CurrentSelected");
+
         Log.i("NoteId ", noteName + "");
 
         if (noteName != null) {
@@ -58,8 +64,8 @@ public class TakeNotesActivity extends AppCompatActivity {
             notesBody.setText(notesContent);
         } else {
             noteName = "";
-            ViewListOfNotesActivity.notesTitles.add("");
-            ViewListOfNotesActivity.notesBodies.add("");
+            notesTitles.add("");
+            notesBodies.add("");
         }
 
 
@@ -95,15 +101,17 @@ public class TakeNotesActivity extends AppCompatActivity {
 
             if(noteName.contains(".txt")){
 
-                if(viewListOfNotesActivity.selectedEvent() != null){
+                if(currentSelected != null){
 
 
                     createDirectories.createCourseCodifyFile();
-                    createDirectories.createEventFolder(viewListOfNotesActivity.selectedEvent());
-                    createDirectories.createSubFolder(viewListOfNotesActivity.selectedEvent(), "Notes");
-                    File newFile = createDirectories.saveMaterial(viewListOfNotesActivity.selectedEvent(), "Notes", notesTitle.getText().toString(), notesBody.getText().toString());
+                    createDirectories.createEventFolder(currentSelected);
+                    createDirectories.createSubFolder(currentSelected, "Notes");
+                    File newFile = createDirectories.saveMaterial(currentSelected, "Notes", notesTitle.getText().toString(), notesBody.getText().toString());
                     MediaScannerConnection.scanFile(TakeNotesActivity.this, new String[]{newFile.toString()}, null, null);
-                    Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
+                    Intent intent = new Intent(TakeNotesActivity.this, AllListActivity.class);
+                    intent.putExtra("Material","Notes");
+                    intent.putExtra("CalendarEvent", currentSelected);
                     startActivity(intent);
                     Toast.makeText(getApplicationContext(), "Saved here..", Toast.LENGTH_LONG).show();
 
@@ -117,19 +125,64 @@ public class TakeNotesActivity extends AppCompatActivity {
             }
               else{
                 currentEvent = getCalendarDetails.getCurrentEvent();
-                if (currentEvent == null) {
+                if (currentEvent.isEmpty()) {
 
                     AlertDialogs alertDialogs = new AlertDialogs(TakeNotesActivity.this);
                     alertDialogs.askPermissionToGoToCalendar();
                     createdEvent= true;
 
                 } else {
+                    if(currentEvent.size() > 1){
 
-                    save();
-                    Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
-                    intent.putExtra("CalendarEvent", currentEvent);
-                    startActivity(intent);
-                    Toast.makeText(getApplicationContext(), "Saved here..", Toast.LENGTH_LONG).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(TakeNotesActivity.this);
+                        builder.setTitle("Choose the event To Save Images");
+                        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                                this,
+                                android.R.layout.simple_list_item_1,
+                                currentEvent );
+
+
+                        builder.setSingleChoiceItems(arrayAdapter, -1,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        selectedCurrentEvent = currentEvent.get(i);
+                                        Toast.makeText(getApplicationContext(), "Selected Event "+ selectedCurrentEvent,Toast.LENGTH_LONG).show();
+
+                                    }
+                                });
+
+                        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+
+                                save();
+                                Intent intent = new Intent(TakeNotesActivity.this, AllListActivity.class);
+                                intent.putExtra("Material", "Notes");
+                                intent.putExtra("CalendarEvent", selectedCurrentEvent);
+                                startActivity(intent);
+                                Toast.makeText(getApplicationContext(), "Saved here..", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        final AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+
+                    }
+
+                    else{
+
+                        selectedCurrentEvent = currentEvent.get(0);
+
+                        save();
+                        Intent intent = new Intent(TakeNotesActivity.this, AllListActivity.class);
+                        intent.putExtra("Material", "Notes");
+                        intent.putExtra("CalendarEvent", selectedCurrentEvent);
+                        startActivity(intent);
+                        Toast.makeText(getApplicationContext(), "Saved here..", Toast.LENGTH_LONG).show();
+                    }
+
+
 
                 }
 
@@ -138,7 +191,8 @@ public class TakeNotesActivity extends AppCompatActivity {
         }
 
         if(id == R.id.goToViewNotes){
-            Intent intent = new Intent(TakeNotesActivity.this, ViewListOfNotesActivity.class);
+            Intent intent = new Intent(TakeNotesActivity.this, AllListActivity.class);
+            intent.putExtra("Material","Notes");
             startActivity(intent);
 
         }
@@ -161,27 +215,28 @@ public class TakeNotesActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if(createdEvent) {
-            currentEvent = getCalendarDetails.getCurrentEvent();
+       /*if(createdEvent) {
+            if(currentEvent.size() > 1)
+                showAlertToChooseEvent(currentEvent);
+            else
+                selectedCurrentEvent = getCalendarDetails.getCurrentEvent().get(0);
             if (!notesTitle.equals("") || !notesBody.equals("")) {
-                if (currentEvent != null) {
+                if (!currentEvent.isEmpty()) {
                     save();
 
                 }
             }
             createdEvent = false;
         }
+        */
     }
 
     public void save(){
         createDirectories.createCourseCodifyFile();
-        createDirectories.createEventFolder(currentEvent);
-        createDirectories.createSubFolder(currentEvent, "Notes");
-        File notesName = createDirectories.saveMaterial(currentEvent, "Notes", notesTitle.getText().toString() + ".txt", notesBody.getText().toString());
+        createDirectories.createEventFolder(selectedCurrentEvent);
+        createDirectories.createSubFolder(selectedCurrentEvent, "Notes");
+        File notesName = createDirectories.saveMaterial(selectedCurrentEvent, "Notes", notesTitle.getText().toString() + ".txt", notesBody.getText().toString());
         MediaScannerConnection.scanFile(TakeNotesActivity.this, new String[]{notesName.toString()}, null, null);
     }
-
-
-
 
 }

@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.TextView;
 
-import com.srishti.srish.coursecodify_v1.R;
 
 import java.util.ArrayList;
 
@@ -23,8 +22,9 @@ import java.util.ArrayList;
      private Context context;
      private ArrayList<String> groupName;
      private ArrayList<String> subdirectoryName;
-        CreateDirectories createDirectories = new CreateDirectories();
-    TextView eventName;
+     CreateDirectories createDirectories = new CreateDirectories();
+     TextView eventName;
+
      public DirectoryExpandableListAdapter(Context context, ArrayList<String> groupName, ArrayList<String> subdirectoreyName){
 
          this.context = context;
@@ -82,11 +82,9 @@ import java.util.ArrayList;
         if(view == null){
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.eventname_layout_expandable, null);
-
-
         }
 
-         eventName = (TextView) view.findViewById(R.id.eventName);
+        eventName = (TextView) view.findViewById(R.id.eventName);
         Log.i("Here I am", "getGroupView");
         eventName.setText(groupName.get(i));
         return view;
@@ -100,7 +98,7 @@ import java.util.ArrayList;
              view = inflater.inflate(R.layout.subdirectory_events_layout_expandable, null);
          }
 
-         final TextView childName = (TextView) view.findViewById(R.id.eventSubdirectory);
+        final TextView childName = (TextView) view.findViewById(R.id.eventSubdirectory);
         childName.setText(subdirectoryName.get(i1));
 
         TextView childCount = (TextView) view.findViewById(R.id.countChildItem);
@@ -115,7 +113,7 @@ import java.util.ArrayList;
             public void onClick(View view) {
                 if(childName.getText().toString().equals("Images")){
                     Intent intent = new Intent(view.getContext() , AllListActivity.class);
-                    intent.putExtra("CurrentCalendarEvent",groupName.get(i) );
+                    intent.putExtra("CalendarEvent",groupName.get(i) );
                     intent.putExtra("Material","Images");
                     context.startActivity(intent);
                 }
@@ -130,7 +128,7 @@ import java.util.ArrayList;
 
                 else if(childName.getText().toString().equals("Recordings")){
 
-                    Intent intent = new Intent(view.getContext() , ViewListOfRecordingsActivity.class);
+                    Intent intent = new Intent(view.getContext() , AllListActivity.class);
                     intent.putExtra("CalendarEvent",groupName.get(i) );
                     intent.putExtra("Material","Recordings");
                     context.startActivity(intent);
@@ -142,6 +140,7 @@ import java.util.ArrayList;
                     Intent intent = new Intent(view.getContext() , AllListActivity.class);
                     intent.putExtra("CalendarEvent",groupName.get(i) );
                     intent.putExtra("Material", "All Materials");
+
                     context.startActivity(intent);
 
                 }

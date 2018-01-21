@@ -19,6 +19,7 @@ public class AllListActivity extends AppCompatActivity {
 
     ViewImagesFragment viewImagesFragment;
     NotesFragment notesFragment;
+    AllMaterialFragment allMaterialFragment;
     RecordingFragment recordingsFragment;
     static Spinner spinnerListOfEvents;
     CreateDirectories createDirectories = new CreateDirectories();
@@ -39,16 +40,30 @@ public class AllListActivity extends AppCompatActivity {
 
         recordingsFragment = new RecordingFragment();
 
+        allMaterialFragment = new AllMaterialFragment();
+
         List listOfevents = new ArrayList<>();
 
         spinnerListOfEvents = (Spinner) findViewById(R.id.spinner);
+
         listOfevents.addAll(createDirectories.readAllDirectoryName(null, null));
         Log.i("Count of Events", listOfevents.size()+ "");
+
         ArrayAdapter<String> arrayAdapterListOfEvents = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,listOfevents );
         arrayAdapterListOfEvents.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerListOfEvents.setAdapter(arrayAdapterListOfEvents);
+
+        if(selectedEvent != null){
+            Log.i("All List Activity", selectedEvent);
+            if(listOfevents.contains(selectedEvent))
+            spinnerListOfEvents.setSelection(arrayAdapterListOfEvents.getPosition(selectedEvent));
+        }
+
         bundle = new Bundle();
-        bundle.putString("Folder", spinnerListOfEvents.getSelectedItem().toString() );
+       
+        bundle.putString("Folder", spinnerListOfEvents.getSelectedItem() +"" );
+        Log.i("Spinner", spinnerListOfEvents.getSelectedItem()+"");
+
         transaction =  getSupportFragmentManager().beginTransaction();
 
 
@@ -59,23 +74,31 @@ public class AllListActivity extends AppCompatActivity {
         }
 
         else if(material.equals("Notes")){
-           // NotesFragment fragment = (NotesFragment) getSupportFragmentManager().findFragmentById(R.id.frameNotes1);
            transaction.add(R.id.frameNotes1, notesFragment);
             notesFragment.setArguments(bundle);
         }
 
         else if(material.equals("Recordings")){
             transaction.replace(R.id.frameRecordings1, recordingsFragment);
-            //recordingsFragment.setArguments(bundle);
+            recordingsFragment.setArguments(bundle);
         }
 
         else if(material.equals("All Materials")){
-            transaction.replace(R.id.frameImages1, viewImagesFragment);
-            //viewImagesFragment.setArguments(bundle);
+           /* transaction.replace(R.id.frameImages1, viewImagesFragment);
+            viewImagesFragment.setArguments(bundle);
             transaction.replace(R.id.frameNotes1, notesFragment);
-           // notesFragment.setArguments(bundle);
+
             transaction.replace(R.id.frameRecordings1,recordingsFragment);
-           // recordingsFragment.setArguments(bundle);
+            */
+
+            transaction.replace(R.id.frameImages1, allMaterialFragment);
+
+            allMaterialFragment.setArguments(bundle);
+
+            /*viewImagesFragment.setArguments(bundle);
+            notesFragment.setArguments(bundle);
+            recordingsFragment.setArguments(bundle);
+            */
         }
 
         transaction.commit();
@@ -95,12 +118,13 @@ public class AllListActivity extends AppCompatActivity {
                   }
 
                   else if(material.equals("Recordings")){
-                      recordingsFragment.onSpinnerChange(event);
+                      recordingsFragment.onSpinnerChanged(event);
                   }
-                  else if(material.equals("All Material")){
-                      notesFragment.onSpinnerChanged(event);
-                      viewImagesFragment.onSpinnerChanged(event);
-                      recordingsFragment.onSpinnerChange(event);
+
+                  else if(material.equals("All Materials")){
+                      Log.i("spinner change", "called");
+                      allMaterialFragment.onSpinnerChanged(event);
+
                   }
 
                 }

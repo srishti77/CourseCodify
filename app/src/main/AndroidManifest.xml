@@ -5,7 +5,9 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -17,9 +19,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
-
-
         <activity android:name=".NavigationDrawerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,38 +34,16 @@
             android:name=".TakeImagesActivity"
             android:parentActivityName=".NavigationDrawerActivity"
             android:theme="@style/AppTheme" />
-        <activity
-            android:name=".ViewListOfPicturesActivity"
-            android:parentActivityName=".TakeImagesActivity"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".ViewImageFullScreenActivity"
-            android:parentActivityName=".ViewListOfPicturesActivity"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".TakeNotesActivity"
-            android:parentActivityName=".NavigationDrawerActivity"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".ViewListOfNotesActivity"
-            android:parentActivityName=".TakeNotesActivity"
-            android:theme="@style/AppTheme" />
+
         <activity
             android:name=".RecordingActivity"
             android:parentActivityName=".NavigationDrawerActivity"
             android:theme="@style/AppTheme" />
+      
         <activity
-            android:name=".ViewListOfRecordingsActivity"
+            android:name=".RecordingsPlay"
             android:parentActivityName=".RecordingActivity"
             android:theme="@style/AppTheme" />
-        <activity
-            android:name=".ViewAllMaterialActivity"
-            android:parentActivityName=".NavigationDrawerActivity"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".RecordingsPlay"
-            android:parentActivityName=".RecordingActivity"
-            android:theme="@style/AppTheme"
-            ></activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -75,9 +52,15 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
 
+        <activity android:name=".AllListActivity"
+            android:parentActivityName=".NavigationDrawerActivity"
+            android:theme="@style/AppTheme"  ></activity>
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

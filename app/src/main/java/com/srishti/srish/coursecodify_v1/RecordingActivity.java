@@ -1,22 +1,25 @@
 package com.srishti.srish.coursecodify_v1;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -25,7 +28,8 @@ public class RecordingActivity extends AppCompatActivity {
     MediaRecorder mediaRecorder;
     CreateDirectories createDirectories = new CreateDirectories();
     GetCalendarDetails getCalendarDetails = new GetCalendarDetails(RecordingActivity.this);
-    String currentEvent = null;
+    ArrayList<String> currentEvent = new ArrayList<String>();
+    static String selectedCurrentEvent;
     boolean createdEvent = false;
     boolean onRecordStart = true;
     ImageView microphoneRecordImage;
@@ -48,14 +52,10 @@ public class RecordingActivity extends AppCompatActivity {
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
         currentEvent = getCalendarDetails.getCurrentEvent();
-        final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
-                .format(new Date());
 
         microphoneRecordImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                try {
                   Log.i("Current Drawable", microphoneRecordImage.getDrawable()+"");
                     if(currentEvent == null){
 
@@ -65,21 +65,38 @@ public class RecordingActivity extends AppCompatActivity {
                     }
                     else{
                         if(onRecordStart){
-                            microphoneRecordImage.setImageResource(R.mipmap.pause);
-                            onRecordStart = false;
+                            if(currentEvent.size()>1){
+                                AlertDialog.Builder builder = new AlertDialog.Builder(RecordingActivity.this);
+                                builder.setTitle("Choose the event To Save Images");
+                                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(RecordingActivity.this,
+                                        android.R.layout.simple_list_item_1,
+                                        currentEvent );
 
-                            startTime = SystemClock.uptimeMillis();
-                            customHandler.postDelayed(updateTimerThread, 0);
 
-                            createDirectories.createCourseCodifyFile();
-                            createDirectories.createEventFolder(currentEvent);
-                            createDirectories.createSubFolder(currentEvent, "Recordings");
-                            String outputFile= Environment
-                                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+ "/CourseCodify/" +currentEvent+"/Recordings/"+ "Rec_"+ timeStamp+".m4a";
+                                builder.setSingleChoiceItems(arrayAdapter, -1,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                selectedCurrentEvent = currentEvent.get(i);
+                                                Toast.makeText(getApplicationContext(), "Selected Event "+ selectedCurrentEvent,Toast.LENGTH_LONG).show();
 
-                            mediaRecorder.setOutputFile(outputFile);
-                            mediaRecorder.prepare();
-                            mediaRecorder.start();
+                                            }
+                                        });
+                                builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        recording(selectedCurrentEvent);
+                                    }
+                                });
+                                final AlertDialog alertDialog = builder.create();
+                                alertDialog.show();
+
+                            }
+                            else{
+                                selectedCurrentEvent = currentEvent.get(0);
+                                recording(selectedCurrentEvent);
+                            }
+
                             Toast.makeText(getApplicationContext(), "Recording start", Toast.LENGTH_LONG).show();
                         }
                         else{
@@ -92,17 +109,12 @@ public class RecordingActivity extends AppCompatActivity {
                             mediaRecorder = null;
                             MediaScannerConnection.scanFile(RecordingActivity.this, new String[]{}, null, null);
 
-
                             Toast.makeText(getApplicationContext(), "Audio Recordering successfully done", Toast.LENGTH_LONG).show();
 
                         }
                         Log.i("Record is pressed", "yayyy");
 
                     }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
             }
         });
@@ -133,7 +145,6 @@ public class RecordingActivity extends AppCompatActivity {
         super.onResume();
 
         if(createdEvent){
-
             Toast.makeText(getApplicationContext(),"You can start Recording by pressing Record button", Toast.LENGTH_LONG ).show();
         }
     }
@@ -152,8 +163,9 @@ public class RecordingActivity extends AppCompatActivity {
         switch(id){
             case R.id.viewlistOfPicture:
                 Log.i("ViewRecordingActivity", "Called");
-                Intent intent = new Intent(RecordingActivity.this, ViewListOfRecordingsActivity.class);
-                intent.putExtra("CalendarEvent", currentEvent);
+                Intent intent = new Intent(RecordingActivity.this, AllListActivity.class);
+                intent.putExtra("Material", "Recordings");
+                intent.putExtra("CalendarEvent", selectedCurrentEvent);
                 startActivity(intent);
                 break;
         }
@@ -161,5 +173,31 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
 
+    void recording(String event){
+        final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
+                .format(new Date());
+        try{
+
+            microphoneRecordImage.setImageResource(R.mipmap.pause);
+            onRecordStart = false;
+
+            startTime = SystemClock.uptimeMillis();
+            customHandler.postDelayed(updateTimerThread, 0);
+
+            createDirectories.createCourseCodifyFile();
+            createDirectories.createEventFolder(event);
+            createDirectories.createSubFolder(event, "Recordings");
+            String outputFile= Environment
+                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+ "/CourseCodify/" +event+"/Recordings/"+ "Rec_"+ timeStamp+".m4a";
+
+            mediaRecorder.setOutputFile(outputFile);
+            mediaRecorder.prepare();
+            mediaRecorder.start();
+        }
+        catch (Exception e){
+            Log.i("Recording", "statred");
+            e.printStackTrace();
+        }
+    }
 
 }

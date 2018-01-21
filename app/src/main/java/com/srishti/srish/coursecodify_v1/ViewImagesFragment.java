@@ -26,15 +26,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class ViewImagesFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
 
     View view;
 
@@ -47,6 +48,11 @@ public class ViewImagesFragment extends Fragment {
 
     final ArrayList<String> imageName = new ArrayList<>();
     String selectedEvent;
+    TextView imagesHeading;
+
+    private OnFragmentInteractionListener mListener;
+
+
     public ViewImagesFragment() {
 
     }
@@ -57,59 +63,21 @@ public class ViewImagesFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         Bundle bundle = getArguments();
+        if(bundle != null)
         selectedEvent = bundle.getString("Folder");
+        Log.i("SelectedEvent", selectedEvent+"");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.i("ViewImage", "FRagment");
+        Log.i("Inside ViewImage", "FRagment");
         view = inflater.inflate(R.layout.fragment_view_images, container, false);
 
-      //  this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-       /* spinnerListOfEvents.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                drawables.clear();
-                nameOfFiles.clear();
-                imageName.clear();
-                arrayAdapter.clear();
-                Log.i("Spinner", "spinner is changed");
-
-                if (createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images").listFiles() != null) {
-
-                    for (File file : createDirectories.getCurrentFile("/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images").listFiles()) {
-                        if (file.isFile()) {
-
-                            drawableImage = Drawable.createFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + spinnerListOfEvents.getSelectedItem() + "/Images/" + file.getName());
-
-                            drawables.add(drawableImage);
-
-                            nameOfFiles.add(file.getName());
-                            imageName.add(file.getName());
-
-
-                        }
-                    }
-
-
-                }
-                arrayAdapter.notifyDataSetChanged();
-
-            }
-
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        */
-
+        imagesHeading = (TextView) view.findViewById(R.id.fragment_image_heading);
         final ListView listView = (ListView) view.findViewById(R.id.listOfImages);
+        getData(selectedEvent);
+
         arrayAdapter = new ListSingleImageAdapter(getActivity(), drawables, imageName);
         listView.setAdapter(arrayAdapter);
 
@@ -117,7 +85,7 @@ public class ViewImagesFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                byte[] byteArray = ViewAllMaterialActivity.getImageToSend(position, drawables);
+                byte[] byteArray = getImageToSend(position, drawables);
 
                 Intent intent = new Intent(getActivity(), ViewImageFullScreenActivity.class);
                 intent.putExtra("ImageView", byteArray);
@@ -177,7 +145,7 @@ public class ViewImagesFragment extends Fragment {
 
 
         catch(Exception e){
-            // Toast.makeText(getApplicationContext(), "File Could not be deleted", Toast.LENGTH_LONG).show();
+
             e.printStackTrace();
         }
 
@@ -204,19 +172,35 @@ public class ViewImagesFragment extends Fragment {
 
     void onSpinnerChanged(String selectedEvent) {
         this.selectedEvent = selectedEvent;
-        Log.i("Inside Notes","spinner");
+        Log.i("Inside Images","spinner");
+
+        if(arrayAdapter != null){
+            arrayAdapter.clear();
+            Log.i("Spinner", "spinner is changed");
+
+            getData(selectedEvent);
+            arrayAdapter.notifyDataSetChanged();
+            if(arrayAdapter.isEmpty())
+                imagesHeading.setText("");
+            else{
+
+                imagesHeading.setText("List of Images");
+            }
+        }
+
+    }
+
+    public void getData(String event){
+
         drawables.clear();
         nameOfFiles.clear();
         imageName.clear();
-        arrayAdapter.clear();
-        Log.i("Spinner", "spinner is changed");
+        if (createDirectories.getCurrentFile("/CourseCodify/" + event + "/Images").listFiles() != null) {
 
-        if (createDirectories.getCurrentFile("/CourseCodify/" + selectedEvent + "/Images").listFiles() != null) {
-
-            for (File file : createDirectories.getCurrentFile("/CourseCodify/" + selectedEvent + "/Images").listFiles()) {
+            for (File file : createDirectories.getCurrentFile("/CourseCodify/" + event + "/Images").listFiles()) {
                 if (file.isFile()) {
 
-                    drawableImage = Drawable.createFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + selectedEvent + "/Images/" + file.getName());
+                    drawableImage = Drawable.createFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + event + "/Images/" + file.getName());
 
                     drawables.add(drawableImage);
 
@@ -225,6 +209,39 @@ public class ViewImagesFragment extends Fragment {
                 }
             }
         }
-        arrayAdapter.notifyDataSetChanged();
     }
+
+    public static byte[] getImageToSend( int position,  ArrayList<Drawable> drawables1  ){
+        Bitmap bitmap = ((BitmapDrawable) drawables1.get(position)).getBitmap();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return byteArray;
+    }
+
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.i("Images Fragment Attach", "called");
+       /* if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }*/
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.i("Image Fragment Dettach", "called");
+        mListener = null;
+    }
+
 }

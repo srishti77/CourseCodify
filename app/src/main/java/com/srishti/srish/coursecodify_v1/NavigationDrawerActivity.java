@@ -40,18 +40,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
     DirectoryExpandableListAdapter directoryExpandableListAdapter;
     static ArrayList<String> listOfEvents_Today = new ArrayList<String>();
     static ArrayList<String> listOfSubDirectory = new ArrayList<String>();
-
     static List<String> calendarNamesList = new ArrayList<String>();
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 17;
     SharedPreferences sharedPreferences;
     boolean firstInstallation = true;
-
+    static String currentSelectedEvent;
     CreateDirectories create = new CreateDirectories();
     final GetCalendarDetails getCalendarName = new GetCalendarDetails(NavigationDrawerActivity.this);
-
-    static boolean calendarPermission = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +72,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         listOfSubDirectory.add("Notes");
         listOfSubDirectory.add("Recordings");
 
-
         if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PERMISSION_GRANTED) ||
                 (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) != PERMISSION_GRANTED)||
                 (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PERMISSION_GRANTED) ||
@@ -94,8 +90,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
                                 Manifest.permission.CAMERA },  MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 
         }
-
-
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(NavigationDrawerActivity.this);
             firstInstallation = sharedPreferences.getBoolean("FIRST_RUN", false);
@@ -137,12 +131,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         }
 
-
         View hView = navigationView.getHeaderView(0);
         TextView textView1 = (TextView) hView.findViewById(R.id.CalendarName);
 
-       if(!calendarNamesList.isEmpty())
-       textView1.setText(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1));
+
+        if(!calendarNamesList.isEmpty()){
+            currentSelectedEvent = calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1);
+            textView1.setText(currentSelectedEvent);
+        }
+
 
         final ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.expandable_LV);
 
@@ -163,24 +160,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
                 listOfEvents_Today.clear();
                 listOfEvents_Today.addAll(getCalendarName.getevents(calendarNamesList.get(sharedPreferences.getInt("SelectedIndex", -1) - 1), time));
-                   // directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
                 directoryExpandableListAdapter = new DirectoryExpandableListAdapter(NavigationDrawerActivity.this, listOfEvents_Today, listOfSubDirectory);
                 expandableListView.setAdapter(directoryExpandableListAdapter);
-
 
             }
         });
 
-
-
-        TextView textView = (TextView) findViewById(R.id.todayEvent);
-
-        textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                 getCalendarName.getCurrentEvent();
-                }
-        });
+        TextView textView = (TextView) findViewById(R.id.todaysEvent);
 
     }
 

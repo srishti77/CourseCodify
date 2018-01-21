@@ -1,0 +1,27 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="10dp"
+    tools:context="com.srishti.srish.coursecodify_v1.RecordingFragment">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_recordings_heading"
+        android:text="@string/recordings_fragment"
+        android:fontFamily="@font/aclonica"/>
+
+    <ListView
+        android:id="@+id/listOfRecordings"
+
+        android:layout_below="@+id/fragment_recordings_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border_listview"
+        android:textStyle = "bold"
+        android:layout_margin = "10dp"
+        />
+</RelativeLayout>

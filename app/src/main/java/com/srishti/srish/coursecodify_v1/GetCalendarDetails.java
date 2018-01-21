@@ -3,19 +3,16 @@ package com.srishti.srish.coursecodify_v1;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.content.ContentResolver;
+import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.util.Log;
-
-import java.net.URI;
 import android.text.format.Time;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -31,7 +28,7 @@ public class GetCalendarDetails {
             CalendarContract.Events.TITLE, CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND
 
     };
-    String currentEventName;
+    ArrayList<String> currentEventName = new ArrayList<String>();
 
     ArrayList<String> eventNames = new ArrayList<String>();
     ArrayList<String> calendarNames = new ArrayList<String>();
@@ -39,6 +36,8 @@ public class GetCalendarDetails {
     public GetCalendarDetails(Context context){
         this.context = context;
     }
+//    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
     public ArrayList<String> getAllCalendarName(){
        try
 
@@ -132,9 +131,9 @@ public class GetCalendarDetails {
         return eventNames;
     }
 
-    public String getCurrentEvent(){
+    public ArrayList<String> getCurrentEvent(){
         Log.i("Inside", "getCurrentEvent");
-        currentEventName = null;
+
         Cursor cur = null;
         ContentResolver cr = context.getContentResolver();
 
@@ -152,7 +151,7 @@ public class GetCalendarDetails {
         String selection = "(" + CalendarContract.Instances.CALENDAR_DISPLAY_NAME + "= ?) AND (" + CalendarContract.Instances.BEGIN + " <= ? ) AND (" + CalendarContract.Instances.END + " >= ? )";
 
 
-        String[] selectionArgs = new String[]{"srishti.kristi12@gmail.com", dtStart+"", dtStart+""};
+        String[] selectionArgs = new String[]{NavigationDrawerActivity.currentSelectedEvent, dtStart+"", dtStart+""};
 
         Uri eventsUri = uri.build();
 
@@ -164,13 +163,16 @@ public class GetCalendarDetails {
 
 
         Log.i("Current time", dtStart+"");
+        int colIndex = cur.getColumnIndex("title");
         for(int i = 0; i< cur.getCount(); i++){
-            Log.i("Event Name", cur.getString(cur.getColumnIndex("title")) );
-            currentEventName = cur.getString(cur.getColumnIndex("title"));
-            Log.i("Start time", cur.getString(cur.getColumnIndex("begin")));
-            Log.i("End time", cur.getString(cur.getColumnIndex("end")));
+            Log.i("Event Name:::", cur.getString(colIndex) );
+            currentEventName.add(cur.getString(colIndex).toString());
+            Log.i("Events added", "yayyy");
+            cur.moveToNext();
         }
 
+
+        Log.i("ListOf Current Event", currentEventName.size()+"");
         cur.close();
         return  currentEventName;
 
@@ -184,8 +186,6 @@ public class GetCalendarDetails {
         ContentUris.appendId(builder, startMills);
         Intent intent = new Intent(Intent.ACTION_VIEW).setData(builder.build());
         context.startActivity(intent);
-
-
     }
 
 }

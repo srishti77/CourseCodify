@@ -21,16 +21,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-
 
 public class NotesFragment extends Fragment {
 
     View view;
+
+    private OnFragmentInteractionListener mListener;
 
     static ArrayAdapter arrayAdapter;
     static ArrayList<String> notesTitles = new ArrayList<String>();
@@ -39,31 +39,27 @@ public class NotesFragment extends Fragment {
     CreateDirectories createDirectories = new CreateDirectories();
 
     String selectedEvent;
-
+    TextView notesHeading;
     public NotesFragment() {
         // Required empty public constructor
     }
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         selectedEvent = bundle.getString("Folder");
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Log.i("View Notes", "Fragment");
-        view = inflater.inflate(R.layout.fragment_notes, container, false);
+        Log.i("Inside", "View Notes Fragment");
+        if(view == null)
+            view = inflater.inflate(R.layout.fragment_notes, container, false);
 
-
-        //ListView -- Lists all the notes
-
+        notesHeading = (TextView) view.findViewById(R.id.fragment_heading);
         final ListView listView = (ListView) view.findViewById(R.id.listView);
         notesTitles.clear();
         notesTitles.addAll(createDirectories.readAllDirectoryName(selectedEvent+ "", "Notes"));
@@ -80,11 +76,10 @@ public class NotesFragment extends Fragment {
                 String notesContent = createDirectories.readContentOfNotesFile(selectedEvent+"/Notes/"+ notesTitles.get(i)).toString();
                 intent.putExtra("NoteName", notesTitles.get(i)+"");
                 intent.putExtra("NotesContent", notesContent);
+                intent.putExtra("CurrentSelected",selectedEvent);
                 startActivity(intent);
             }
         });
-
-
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
@@ -121,7 +116,6 @@ public class NotesFragment extends Fragment {
         return view;
     }
 
-
     public void deleteNotes(int position, String event, String material, ArrayList<String> materials ){
 
         File directory = createDirectories.getCurrentFile("CourseCodify/"+event+"/Notes");
@@ -144,14 +138,11 @@ public class NotesFragment extends Fragment {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)+"/CourseCodify/"+event+"/Notes/"+notesName);
         Intent myShareIntent = new Intent();
         myShareIntent.setAction(Intent.ACTION_SEND);
-
-
         Uri fileURI = FileProvider.getUriForFile(context ,"com.srishti.srish.coursecodify_v1", file);
         Log.i("The path..", fileURI+"");
         myShareIntent.putExtra(Intent.EXTRA_STREAM, fileURI );
         myShareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         myShareIntent.setType("text/*");
-
 
         shareActionProvider.setShareIntent(myShareIntent);
 
@@ -161,10 +152,42 @@ public class NotesFragment extends Fragment {
     void onSpinnerChanged(String event){
         selectedEvent = event;
         notesTitles.clear();
-        notesTitles.addAll(createDirectories.readAllDirectoryName(event, "Notes"));
 
-        arrayAdapter.notifyDataSetChanged();
+        if(arrayAdapter != null){
+            arrayAdapter.clear();
+            notesTitles.addAll(createDirectories.readAllDirectoryName(event, "Notes"));
+            arrayAdapter.notifyDataSetChanged();
+            if(arrayAdapter.isEmpty())
+                notesHeading.setText("");
+            else if(!arrayAdapter.isEmpty())
+                notesHeading.setText("List of Notes");
+        }
+
     }
 
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.i("Notes Fragment Attach", "called");
+      /*  if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }*/
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.i("Notes Fragment Dettach", "called");
+        mListener = null;
+    }
 
 }

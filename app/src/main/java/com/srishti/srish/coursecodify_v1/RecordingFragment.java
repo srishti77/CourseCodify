@@ -1,14 +1,13 @@
 package com.srishti.srish.coursecodify_v1;
 
+
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,8 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,28 +32,32 @@ public class RecordingFragment extends SharingImplementation {
 
     View view;
     CreateDirectories createDirectories = new CreateDirectories();
-   // static Spinner spinnerListOfEvents;
     static ArrayList<String> recordings = new ArrayList<String>();
     static ArrayAdapter arrayAdapter;
-    static boolean onPlayStart = true;
-    String event;
+
     String folder;
+    boolean onPlayStart = true;
+    TextView recordingsHeading;
+
+    private OnFragmentInteractionListener mListener;
+
+
     public RecordingFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getActivity().getIntent();
-        event = intent.getStringExtra("CalendarEvent");
+
+
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.i("View Recording", "Fragment");
+        Log.i("Inside View Recording", "Fragment");
         view = inflater.inflate(R.layout.fragment_recording, container, false);
         Bundle bundle = getArguments();
 
@@ -66,37 +69,17 @@ public class RecordingFragment extends SharingImplementation {
         listOfevents.clear();
         listOfevents.addAll(createDirectories.readAllDirectoryName(null, null));
 
-
+        recordingsHeading = (TextView) view.findViewById(R.id.fragment_recordings_heading);
         final ListView listView = (ListView) view.findViewById(R.id.listOfRecordings);
         recordings.clear();;
         recordings.addAll(createDirectories.readAllDirectoryName(folder+ "", "Recordings"));
         arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, recordings);
         listView.setAdapter(arrayAdapter);
 
-        /*spinnerListOfEvents.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                Log.i("SpinnerOnChange ", "Listener called");
-                recordings.clear();
-                Log.i("selectedItem from list", spinnerListOfEvents.getSelectedItem()+ "");
-                recordings.addAll(createDirectories.readAllDirectoryName(spinnerListOfEvents.getSelectedItem()+ "", "Recordings"));
-
-                arrayAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-*/
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
-
+                onPlayStart = true;
 
                 letsPlay(view, i, recordings.get(i));
 
@@ -179,7 +162,12 @@ public class RecordingFragment extends SharingImplementation {
                     onPlayStart = false;
 
                     mediaPlayer.start();
-                    seekBar.setMax(mediaPlayer.getDuration() / 1000);
+                    try{
+                        seekBar.setMax(mediaPlayer.getDuration() / 1000);
+                    }
+                  catch(Exception e){
+                      Toast.makeText(getActivity(), "Try again", Toast.LENGTH_LONG).show();
+                  }
                     final Handler handler = new Handler();
 
                     Runnable updateSeekBar = new Runnable() {
@@ -207,6 +195,8 @@ public class RecordingFragment extends SharingImplementation {
             }
         });
 
+
+
     }
 
     public void deleteRecordings(int position, String event, ArrayList<String> filename ){
@@ -219,16 +209,51 @@ public class RecordingFragment extends SharingImplementation {
                 filename.remove(position);
             }
         }
+     }
 
 
-    }
+    public void onSpinnerChanged(String event){
+        folder = event;
 
-    public void onSpinnerChange(String event){
         recordings.clear();
 
-        recordings.addAll(createDirectories.readAllDirectoryName(event, "Recordings"));
 
-        arrayAdapter.notifyDataSetChanged();
+        if(arrayAdapter != null){
+            recordings.addAll(createDirectories.readAllDirectoryName(event, "Recordings"));
+            arrayAdapter.notifyDataSetChanged();
+            Log.i("Recadapter count", arrayAdapter.getCount()+"");
+            if(arrayAdapter.isEmpty())
+                recordingsHeading.setText("");
+            else{
+                recordingsHeading.setText("List of Recordings");
+            }
+        }
+
     }
 
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.i("Record Fragment Attach", "called");
+       /* if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }*/
+
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.i("Record Fragment Dettach", "called");
+        mListener = null;
+    }
 }
