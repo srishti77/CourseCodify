@@ -215,20 +215,6 @@ public class TakeNotesActivity extends CourseCodifyHelper {
     protected void onResume() {
         super.onResume();
 
-       /*if(createdEvent) {
-            if(currentEvent.size() > 1)
-                showAlertToChooseEvent(currentEvent);
-            else
-                selectedCurrentEvent = getCalendarDetails.getCurrentEvent().get(0);
-            if (!notesTitle.equals("") || !notesBody.equals("")) {
-                if (!currentEvent.isEmpty()) {
-                    save();
-
-                }
-            }
-            createdEvent = false;
-        }
-        */
     }
 
     public void save(){

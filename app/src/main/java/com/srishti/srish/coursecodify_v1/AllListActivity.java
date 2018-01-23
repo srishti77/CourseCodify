@@ -23,7 +23,6 @@ public class AllListActivity extends AppCompatActivity {
     RecordingFragment recordingsFragment;
     static Spinner spinnerListOfEvents;
     CreateDirectories createDirectories = new CreateDirectories();
-    boolean firsttime = true;
     FragmentTransaction transaction;
     Bundle bundle;
     @Override
@@ -84,21 +83,13 @@ public class AllListActivity extends AppCompatActivity {
         }
 
         else if(material.equals("All Materials")){
-           /* transaction.replace(R.id.frameImages1, viewImagesFragment);
-            viewImagesFragment.setArguments(bundle);
-            transaction.replace(R.id.frameNotes1, notesFragment);
 
-            transaction.replace(R.id.frameRecordings1,recordingsFragment);
-            */
 
             transaction.replace(R.id.frameImages1, allMaterialFragment);
 
             allMaterialFragment.setArguments(bundle);
 
-            /*viewImagesFragment.setArguments(bundle);
-            notesFragment.setArguments(bundle);
-            recordingsFragment.setArguments(bundle);
-            */
+
         }
 
         transaction.commit();

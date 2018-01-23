@@ -39,7 +39,16 @@
             android:name=".RecordingActivity"
             android:parentActivityName=".NavigationDrawerActivity"
             android:theme="@style/AppTheme" />
-      
+        <activity
+            android:name=".TakeNotesActivity"
+            android:parentActivityName=".NavigationDrawerActivity"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".ViewImageFullScreenActivity"
+            android:parentActivityName=".AllListActivity"
+            android:theme="@style/AppTheme" />
+
         <activity
             android:name=".RecordingsPlay"
             android:parentActivityName=".RecordingActivity"

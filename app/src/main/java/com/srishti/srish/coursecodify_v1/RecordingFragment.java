@@ -107,7 +107,7 @@ public class RecordingFragment extends SharingImplementation {
 
                         if(id == R.id.share){
                             item = popupMenu.getMenu().findItem(id);
-                            shareRecordings(folder, recordings.get(position), getActivity());
+                            shareRecordings(folder, recordings.get(position), getActivity(),item);
 
                         }
                         return true;
@@ -241,12 +241,7 @@ public class RecordingFragment extends SharingImplementation {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.i("Record Fragment Attach", "called");
-       /* if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
+
 
     }
 
