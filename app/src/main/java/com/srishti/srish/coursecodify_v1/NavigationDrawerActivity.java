@@ -166,7 +166,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             }
         });
 
-        TextView textView = (TextView) findViewById(R.id.todaysEvent);
 
     }
 
@@ -231,10 +230,17 @@ public class NavigationDrawerActivity extends AppCompatActivity
           startActivity(intent);
 
         } else if (id == R.id.nav_setting) {
-
-        } else if (id == R.id.nav_Forum) {
+          Intent intent = new Intent(NavigationDrawerActivity.this, SettingActivity.class);
+          startActivity(intent);
 
         }
+      else if (id == R.id.nav_material) {
+          Intent intent = new Intent(NavigationDrawerActivity.this, AllListActivity.class);
+          intent.putExtra("Material", "All Materials");
+          startActivity(intent);
+
+      }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

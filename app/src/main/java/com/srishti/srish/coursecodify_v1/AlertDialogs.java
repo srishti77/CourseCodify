@@ -47,7 +47,7 @@ public class AlertDialogs {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        Toast.makeText(context, "Create Event Pressed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Not Now Pressed", Toast.LENGTH_SHORT).show();
 
                     }
                 });

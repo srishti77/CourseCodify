@@ -39,14 +39,14 @@ public class ViewImagesFragment extends Fragment {
 
     View view;
 
-    ListSingleImageAdapter arrayAdapter;
-    ArrayList<Drawable> drawables = new ArrayList<Drawable>();
+    static ListSingleImageAdapter arrayAdapter;
+    static ArrayList<Drawable> drawables = new ArrayList<Drawable>();
     ArrayList<String> nameOfFiles = new ArrayList<String>();
 
     Drawable drawableImage;
     CreateDirectories createDirectories = new CreateDirectories();
 
-    final ArrayList<String> imageName = new ArrayList<>();
+    final static ArrayList<String> imageName = new ArrayList<>();
     String selectedEvent;
     TextView imagesHeading;
 
@@ -81,6 +81,11 @@ public class ViewImagesFragment extends Fragment {
         arrayAdapter = new ListSingleImageAdapter(getActivity(), drawables, imageName);
         listView.setAdapter(arrayAdapter);
 
+        if(arrayAdapter.isEmpty())
+            imagesHeading.setText("");
+        else
+            imagesHeading.setText("List of Images");
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -89,6 +94,13 @@ public class ViewImagesFragment extends Fragment {
 
                 Intent intent = new Intent(getActivity(), ViewImageFullScreenActivity.class);
                 intent.putExtra("ImageView", byteArray);
+                intent.putExtra("Position", position);
+                intent.putExtra("Selected Event", selectedEvent);
+                intent.putExtra("ImageName", imageName.get(position));
+                Log.i("Image Position", position+"");
+                Log.i("Image Name", imageName.get(position));
+               // intent.putExtra("Drawables", drawables);
+
 
                 startActivity(intent);
             }
@@ -111,6 +123,7 @@ public class ViewImagesFragment extends Fragment {
                         if (id == R.id.delete) {
 
                             deleteImages(position, selectedEvent ,drawables,imageName);
+
                             arrayAdapter.notifyDataSetChanged();
                         }
 
@@ -135,17 +148,21 @@ public class ViewImagesFragment extends Fragment {
         try{
             File directory = createDirectories.getCurrentFile("CourseCodify/" + event + "/Images");
             for (File file : directory.listFiles()) {
-                if (imageNameDelete.get(position).compareTo(file.getName()) == 0) {
+                if (imageNameDelete.get(position).equals(file.getName())) {
                     file.delete();
+                    if(drawablesDelete != null)
+                        drawablesDelete.remove(position);
+                    if(imageNameDelete.size()>0){
+                        Log.i("ImageName Count", "Checking");
+                        imageNameDelete.remove(position);
+                    }
+
                 }
             }
-            drawablesDelete.remove(position);
-            imageNameDelete.remove(position);
+
         }
 
-
         catch(Exception e){
-
             e.printStackTrace();
         }
 
@@ -200,6 +217,7 @@ public class ViewImagesFragment extends Fragment {
             for (File file : createDirectories.getCurrentFile("/CourseCodify/" + event + "/Images").listFiles()) {
                 if (file.isFile()) {
 
+                    Log.i("Get Data", "-----");
                     drawableImage = Drawable.createFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/CourseCodify/" + event + "/Images/" + file.getName());
 
                     drawables.add(drawableImage);
@@ -229,12 +247,7 @@ public class ViewImagesFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.i("Images Fragment Attach", "called");
-       /* if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
+
     }
 
     @Override
@@ -243,5 +256,12 @@ public class ViewImagesFragment extends Fragment {
         Log.i("Image Fragment Dettach", "called");
         mListener = null;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getData(selectedEvent);
+    }
+
 
 }

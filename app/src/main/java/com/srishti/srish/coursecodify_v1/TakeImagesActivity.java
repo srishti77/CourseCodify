@@ -171,14 +171,15 @@ public class TakeImagesActivity extends CourseCodifyHelper {
                 }
                 void save(final byte[] bytes)
                 {
-                    final File file12=getOutputMediaFile();
+                    final File file12 = getOutputMediaFile();
                     /*
                     If  there is no current event we direct them to the google calendar
                      */
                     setByteOfImage(bytes);
                     if(file12 == null) {
                         Log.i("No Event", "called");
-                        goTOCalendar();
+
+                        askPermissionToGoToCalendar();
                         Toast.makeText(getApplicationContext(), "You have to create an event to save the file", Toast.LENGTH_LONG).show();
 
                     }

@@ -73,12 +73,12 @@ public class AllListActivity extends AppCompatActivity {
         }
 
         else if(material.equals("Notes")){
-           transaction.add(R.id.frameNotes1, notesFragment);
+           transaction.add(R.id.frameImages1, notesFragment);
             notesFragment.setArguments(bundle);
         }
 
         else if(material.equals("Recordings")){
-            transaction.replace(R.id.frameRecordings1, recordingsFragment);
+            transaction.replace(R.id.frameImages1, recordingsFragment);
             recordingsFragment.setArguments(bundle);
         }
 

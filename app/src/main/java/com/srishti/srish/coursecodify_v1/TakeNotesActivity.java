@@ -127,8 +127,9 @@ public class TakeNotesActivity extends CourseCodifyHelper {
                 currentEvent = getCalendarDetails.getCurrentEvent();
                 if (currentEvent.isEmpty()) {
 
-                    AlertDialogs alertDialogs = new AlertDialogs(TakeNotesActivity.this);
-                    alertDialogs.askPermissionToGoToCalendar();
+                  //  AlertDialogs alertDialogs = new AlertDialogs(TakeNotesActivity.this);
+                   // alertDialogs.
+                    askPermissionToGoToCalendar();
                     createdEvent= true;
 
                 } else {
@@ -140,7 +141,6 @@ public class TakeNotesActivity extends CourseCodifyHelper {
                                 this,
                                 android.R.layout.simple_list_item_1,
                                 currentEvent );
-
 
                         builder.setSingleChoiceItems(arrayAdapter, -1,
                                 new DialogInterface.OnClickListener() {
@@ -155,8 +155,6 @@ public class TakeNotesActivity extends CourseCodifyHelper {
                         builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-
-
                                 save();
                                 Intent intent = new Intent(TakeNotesActivity.this, AllListActivity.class);
                                 intent.putExtra("Material", "Notes");

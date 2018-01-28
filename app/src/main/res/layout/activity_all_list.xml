@@ -3,7 +3,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@mipmap/patternz">
 
     <RelativeLayout
     android:layout_width="match_parent"
@@ -19,31 +20,15 @@
 
 
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxHeight="200dp"
-        android:layout_below="@id/spinner"
-        android:id="@+id/frameRecordings1">
-
-    </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxHeight="200dp"
             android:id="@+id/frameImages1"
-            android:layout_below="@+id/frameRecordings1">
+            android:layout_below="@+id/spinner">
         </FrameLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxHeight="200dp"
-        android:layout_below="@id/frameImages1"
-        android:id="@+id/frameNotes1">
-
-    </FrameLayout>
 
 
 

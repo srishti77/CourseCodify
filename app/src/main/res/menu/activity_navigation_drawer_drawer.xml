@@ -16,22 +16,22 @@
             android:id="@+id/nav_audioRecord"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Audio Record" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+
     </group>
 
     <item android:title="Communicate">
         <menu>
+
+            <item
+                android:id="@+id/nav_material"
+                android:icon="@android:drawable/ic_menu_save"
+                android:title="Material" />
+
             <item
                 android:id="@+id/nav_setting"
                 android:icon="@drawable/ic_menu_share"
                 android:title="Setting" />
-            <item
-                android:id="@+id/nav_Forum"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+
         </menu>
     </item>
 

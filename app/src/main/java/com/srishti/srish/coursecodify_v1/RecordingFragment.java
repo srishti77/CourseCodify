@@ -76,6 +76,11 @@ public class RecordingFragment extends SharingImplementation {
         arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, recordings);
         listView.setAdapter(arrayAdapter);
 
+        if(arrayAdapter.isEmpty())
+            recordingsHeading.setText("");
+        else
+            recordingsHeading.setText("List of Recordings");
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
@@ -217,8 +222,8 @@ public class RecordingFragment extends SharingImplementation {
 
         recordings.clear();
 
-
         if(arrayAdapter != null){
+            arrayAdapter.clear();
             recordings.addAll(createDirectories.readAllDirectoryName(event, "Recordings"));
             arrayAdapter.notifyDataSetChanged();
             Log.i("Recadapter count", arrayAdapter.getCount()+"");
