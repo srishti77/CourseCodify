@@ -18,7 +18,9 @@ import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by User on 26/11/2017.
- * get all the calendar Names present in the google calendar
+ * Get all the calendar Names present in the google calendar
+ * Get all events for the particular calendar, so that the user sees the events for different dates
+ * Get current Event so that the folder can be created
  */
 
 public class GetCalendarDetails {

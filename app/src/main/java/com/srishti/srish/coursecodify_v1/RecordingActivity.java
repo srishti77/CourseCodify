@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class RecordingActivity extends AppCompatActivity {
+public class RecordingActivity extends CourseCodifyHelper {
 
     MediaRecorder mediaRecorder;
     CreateDirectories createDirectories = new CreateDirectories();
@@ -59,8 +59,8 @@ public class RecordingActivity extends AppCompatActivity {
                   Log.i("Current Drawable", microphoneRecordImage.getDrawable()+"");
                     if(currentEvent == null){
 
-                        AlertDialogs alertDialogs = new AlertDialogs(RecordingActivity.this);
-                        alertDialogs.askPermissionToGoToCalendar();
+
+                        askPermissionToGoToCalendar();
                         createdEvent= true;
                     }
                     else{
