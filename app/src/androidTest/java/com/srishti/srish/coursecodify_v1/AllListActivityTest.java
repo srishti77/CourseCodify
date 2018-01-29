@@ -1,10 +1,13 @@
 package com.srishti.srish.coursecodify_v1;
 
+import android.content.Intent;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 /**
@@ -22,7 +25,9 @@ public class AllListActivityTest {
 
     @Test
     public void onCreate() throws Exception {
-        assertNotNull(allListActivity.material);
+       allListActivity  = activityTestRule.getActivity();
+        if(allListActivity.material != null)
+        assertThat(allListActivity.material, anyOf(is("Notes"), is("Images"), is("Recordings"), is("All Materials")));
     }
 
 }

@@ -25,12 +25,13 @@ public class AllListActivity extends AppCompatActivity {
     CreateDirectories createDirectories = new CreateDirectories();
     FragmentTransaction transaction;
     Bundle bundle;
+    Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_list);
 
-        Intent intent = getIntent();
+        intent = getIntent();
         selectedEvent = intent.getStringExtra("CalendarEvent");
         material = intent.getStringExtra("Material");
 
@@ -65,30 +66,35 @@ public class AllListActivity extends AppCompatActivity {
 
         transaction =  getSupportFragmentManager().beginTransaction();
 
+        if(material != null){
 
-        if(material.equals("Images")){
+            if(material.equals("Images")){
 
-            transaction.replace(R.id.frameImages1, viewImagesFragment);
-            viewImagesFragment.setArguments(bundle);
-        }
+                transaction.replace(R.id.frameImages1, viewImagesFragment);
+                viewImagesFragment.setArguments(bundle);
+            }
 
-        else if(material.equals("Notes")){
-           transaction.add(R.id.frameImages1, notesFragment);
-            notesFragment.setArguments(bundle);
-        }
+            else if(material.equals("Notes")){
 
-        else if(material.equals("Recordings")){
-            transaction.replace(R.id.frameImages1, recordingsFragment);
-            recordingsFragment.setArguments(bundle);
-        }
+                transaction.add(R.id.frameImages1, notesFragment);
+                notesFragment.setArguments(bundle);
 
-        else if(material.equals("All Materials")){
+            }
+
+            else if(material.equals("Recordings")){
+
+                transaction.replace(R.id.frameImages1, recordingsFragment);
+                recordingsFragment.setArguments(bundle);
+
+            }
+
+            else if(material.equals("All Materials")){
+
+                transaction.replace(R.id.frameImages1, allMaterialFragment);
+                allMaterialFragment.setArguments(bundle);
 
 
-            transaction.replace(R.id.frameImages1, allMaterialFragment);
-
-            allMaterialFragment.setArguments(bundle);
-
+            }
 
         }
 
@@ -99,24 +105,28 @@ public class AllListActivity extends AppCompatActivity {
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                     String event = spinnerListOfEvents.getSelectedItem().toString();
-                  if(material.equals("Images")){
-                      viewImagesFragment.onSpinnerChanged(event);
+                    if(material != null){
 
-                  }
+                        if(material.equals("Images")){
+                            viewImagesFragment.onSpinnerChanged(event);
 
-                  else if(material.equals("Notes")){
-                          notesFragment.onSpinnerChanged(event);
-                  }
+                        }
 
-                  else if(material.equals("Recordings")){
-                      recordingsFragment.onSpinnerChanged(event);
-                  }
+                        else if(material.equals("Notes")){
+                            notesFragment.onSpinnerChanged(event);
+                        }
 
-                  else if(material.equals("All Materials")){
-                      Log.i("spinner change", "called");
-                      allMaterialFragment.onSpinnerChanged(event);
+                        else if(material.equals("Recordings")){
+                            recordingsFragment.onSpinnerChanged(event);
+                        }
 
-                  }
+                        else if(material.equals("All Materials")){
+                            Log.i("spinner change", "called");
+                            allMaterialFragment.onSpinnerChanged(event);
+
+                        }
+                    }
+
 
                 }
 
