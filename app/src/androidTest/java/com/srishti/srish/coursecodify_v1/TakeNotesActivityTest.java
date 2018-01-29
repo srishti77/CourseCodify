@@ -11,6 +11,7 @@ import static org.junit.Assert.*;
 
 /**
  * Created by User on 28/01/2018.
+ * If there are some current events, check if one of them are selected before saving.
  */
 public class TakeNotesActivityTest {
     @Rule
@@ -20,7 +21,7 @@ public class TakeNotesActivityTest {
     private TakeNotesActivity takeNotesActivity = null;
 
 
-    //folder exist of not when the save is performed if the
+
     @Test
     public void save() throws Exception {
 

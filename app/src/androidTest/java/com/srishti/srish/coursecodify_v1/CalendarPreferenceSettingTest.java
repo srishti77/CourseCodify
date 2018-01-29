@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 /**
  * Created by User on 27/01/2018.
+ * Check if the any one of the present calendar is saved or not.
  */
 public class CalendarPreferenceSettingTest {
 
